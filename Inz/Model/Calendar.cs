@@ -17,7 +17,7 @@
         public Patient? Patient { get; set; }
         public Status Status { get; set; } = null!;
         public TimeBlock TimeBlock { get; set; } = null!;
-        public Service Service { get; set; } = null!;
+        public Service? Service { get; set; }
 
 
     }

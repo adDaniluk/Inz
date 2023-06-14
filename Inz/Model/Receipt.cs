@@ -7,7 +7,8 @@
         public DateTime ExpirationDate { get; set; }
         public string Description { get; set; } = null!;
         public ICollection<ReceiptMedicine> ReceiptMedicines { get; set; } = new List<ReceiptMedicine>();
-        public ICollection<DoctorVisit> DoctorVisits { get; set; } = new List<DoctorVisit>();
+        public DoctorVisit DoctorVisit { get; set; } = null!;
+        public int DoctorVisitId { get; set; }
 
     }
 }
