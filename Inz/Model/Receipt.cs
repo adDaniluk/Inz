@@ -1,4 +1,6 @@
-﻿namespace Inz.Model
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Inz.Model
 {
     public class Receipt
     {
