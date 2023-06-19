@@ -4,7 +4,6 @@ namespace Inz.Model
 {
     public class PaymentType
     {
-        public PaymentType() { }
         public int Id { get; set; }
         [MaxLength(100)]
         public string TypeName { get; set; } = null!;

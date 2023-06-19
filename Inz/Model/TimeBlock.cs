@@ -11,6 +11,5 @@ namespace Inz.Model
         [MaxLength(10)]
         public string EndHour { get; set; } = null!;
         public ICollection<Calendar> Calendars { get; set; } = new List<Calendar>();
-
     }
 }

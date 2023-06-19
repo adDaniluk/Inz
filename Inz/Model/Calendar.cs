@@ -2,8 +2,6 @@
 {
     public class Calendar : TimestampModel
     {
-        public Calendar() { }
-
         public int Id { get; set; }
         public DateTime Date { get; set; }
         public int? ServicePrice { get; set; }
@@ -18,7 +16,5 @@
         public Status Status { get; set; } = null!;
         public TimeBlock TimeBlock { get; set; } = null!;
         public Service? Service { get; set; }
-
-
     }
 }

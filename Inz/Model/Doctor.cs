@@ -2,7 +2,6 @@
 {
     public class Doctor : User
     {
-        public Doctor() { }
         public int DoctorId { get; set; }
         public int LicenseNumber { get; set; }
         public string? Biography { get; set; }

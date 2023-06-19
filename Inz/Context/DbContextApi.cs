@@ -134,10 +134,115 @@ namespace Inz.Context
             modelBuilder.Entity<ReceiptMedicine>()
                 .HasKey(rm => new { rm.MedicineId, rm.ReceiptId });
 
+//Modlbuilder Annotations
 
+            modelBuilder.Entity<Address>()
+                .Property(a => a.Street)
+                .HasMaxLength(100);
 
+            modelBuilder.Entity<Address>()
+                .Property(a => a.City)
+                .HasMaxLength(100);
 
+            modelBuilder.Entity<Address>()
+                .Property(a => a.PostCode)
+                .HasMaxLength(6);
 
+            modelBuilder.Entity<Address>()
+                .Property(a => a.PostCode)
+                .HasMaxLength(6);
+
+            modelBuilder.Entity<Disease>()
+                .Property(d => d.Name)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<DoctorVisit>()
+                .Property(dv => dv.EndHour)
+                .HasMaxLength(10);
+
+            modelBuilder.Entity<DoctorVisit>()
+                .Property(dv => dv.RatingNote)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<MedicalSpecialization>()
+                .Property(ms => ms.Name)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Medicine>()
+                .Property(m => m.Name)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<PaymentType>()
+               .Property(pt => pt.TypeName)
+               .HasMaxLength(100);
+
+            modelBuilder.Entity<Service>()
+               .Property(s => s.Description)
+               .HasMaxLength(200);
+
+            modelBuilder.Entity<Service>()
+               .Property(s => s.Name)
+               .HasMaxLength(200);
+
+            modelBuilder.Entity<Status>()
+               .Property(s => s.StatusName)
+               .HasMaxLength(100);
+
+            modelBuilder.Entity<TimeBlock>()
+               .Property(tb => tb.StartHour)
+               .HasMaxLength(10);
+
+            modelBuilder.Entity<TimeBlock>()
+              .Property(tb => tb.EndHour)
+              .HasMaxLength(10);
+
+            modelBuilder.Entity<Doctor>()
+                .Property(d => d.Login)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Doctor>()
+                .Property(d => d.Password)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Doctor>()
+                .Property(d => d.Email)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Doctor>()
+                .Property(d => d.Phone)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Doctor>()
+                .Property(d => d.Name)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<Doctor>()
+                .Property(d => d.Surname)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<Patient>()
+                .Property(d => d.Login)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Patient>()
+                .Property(d => d.Password)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Patient>()
+                .Property(d => d.Email)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Patient>()
+                .Property(d => d.Phone)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Patient>()
+                .Property(d => d.Name)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<Patient>()
+                .Property(d => d.Surname)
+                .HasMaxLength(200);
         }
     }
 }
