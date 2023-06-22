@@ -1,8 +1,6 @@
-﻿using Inz.Model;
-
-namespace Inz.DTOModel
+﻿namespace Inz.DTOModel
 {
-    public class PatientDTO
+    public class DoctorDTO
     {
         public string Login { get; set; } = null!;
         public string Password { get; set; } = null!;

@@ -1,29 +1,25 @@
 ﻿using Inz.Context;
-using Inz.DTOModel;
 using Inz.Model;
 
 namespace Inz.Repository
 {
-    public class PatientRepository
+    public class PatientRepository: IPatientRepository
     {
-        private readonly DbContextApi _dbContextApi1;
-        public PatientRepository(DbContextApi dbContextApi)
+        private readonly DbContextApi _dbContextApi;
+
+        public PatientRepository(DbContextApi dbContext)
         {
-            this._dbContextApi1 = dbContextApi;
+            _dbContextApi = dbContext;
         }
 
-        public async Task InserNewPatient(Patient patient, Address address)
+        public async Task InsertNewPatientAsync(Patient patient)
         {
+            await _dbContextApi.Patients.AddAsync(patient);
+        }
 
-            await _dbContextApi1.Addresses.AddAsync(address);
-
-            var addressId = address.Id;
-
-            patient.AddressId = addressId;
-
-            await _dbContextApi1.Patients.AddAsync(patient);
-
-            _dbContextApi1.SaveChanges();
+        public async Task SaveChangesAsync()
+        {
+            await _dbContextApi.SaveChangesAsync();
         }
     }
 }

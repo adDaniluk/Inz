@@ -1,5 +1,6 @@
 using Inz.Context;
-using Inz.Model;
+using Inz.Repository;
+using Inz.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<DbContextApi>(option => option.UseSqlServer(
     builder.Configuration.GetSection("ConnectionDbStrings")["WebApplication3Context"]));
+
+builder.Services.AddScoped<IPatientService, PatientService>();
+builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 
 var app = builder.Build();
 

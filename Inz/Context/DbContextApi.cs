@@ -5,7 +5,6 @@ namespace Inz.Context
 {
     public class DbContextApi: DbContext
     {
-        
         public DbContextApi(DbContextOptions options) : base(options)
         {
         }
