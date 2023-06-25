@@ -1,5 +1,8 @@
 ﻿using Inz.Context;
 using Inz.Model;
+using Inz.OneOfHelper;
+using Microsoft.Data.SqlClient;
+using OneOf;
 
 namespace Inz.Repository
 {
@@ -17,9 +20,16 @@ namespace Inz.Repository
             await _dbContextApi.Patients.AddAsync(patient);
         }
 
-        public async Task SaveChangesAsync()
+        public async Task<OneOf<Patient, DisconnectFromDatabase>> SaveChangesAsync()
         {
-            await _dbContextApi.SaveChangesAsync();
+            if (_dbContextApi.Database.CanConnect())
+            {
+                await _dbContextApi.SaveChangesAsync();
+                return new Patient();
+            }
+            return new DisconnectFromDatabase();
         }
+        
+
     }
 }

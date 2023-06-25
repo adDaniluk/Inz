@@ -1,6 +1,8 @@
 ﻿using Inz.DTOModel;
 using Inz.Model;
+using Inz.OneOfHelper;
 using Inz.Repository;
+using OneOf;
 
 namespace Inz.Services
 {
@@ -13,7 +15,7 @@ namespace Inz.Services
             _patientRepository = patientRepository;
         }
 
-        public async Task InsertPatientAsync(PatientDTO patientDTO)
+        public async Task<OneOf<Patient, DisconnectFromDatabase>> InsertPatientAsync(PatientDTO patientDTO)
         {
             Address address = new Address()
             {
@@ -40,7 +42,14 @@ namespace Inz.Services
             };
 
             await _patientRepository.InsertNewPatientAsync(patient);
-            await _patientRepository.SaveChangesAsync();
+            var returnValue = await _patientRepository.SaveChangesAsync();
+
+            if(returnValue.Value.GetType() == typeof(DisconnectFromDatabase))
+            {
+                return new DisconnectFromDatabase();
+            }
+
+            return new Patient();
         }
 
         public async Task ValidateUser()

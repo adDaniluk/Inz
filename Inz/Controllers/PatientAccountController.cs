@@ -1,4 +1,5 @@
 ﻿using Inz.DTOModel;
+using Inz.OneOfHelper;
 using Inz.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,8 +19,12 @@ namespace Inz.Controllers
         [HttpPost]
         public async Task<IActionResult> CreatePatientAsync(PatientDTO patientDTO)
         {
-            await _patientService.InsertPatientAsync(patientDTO);
-            return Ok();
+            var returnValue = await _patientService.InsertPatientAsync(patientDTO);
+            if(returnValue.Value.GetType() == typeof(DisconnectFromDatabase))
+            {
+                return Problem("Cannot connect to the database, please contact Admin@test.com");
+            }
+            return Ok("New user has been created");
         }
 
     }
