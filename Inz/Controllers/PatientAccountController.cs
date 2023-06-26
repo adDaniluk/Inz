@@ -20,9 +20,11 @@ namespace Inz.Controllers
         public async Task<IActionResult> CreatePatientAsync(PatientDTO patientDTO)
         {
             var returnValue = await _patientService.InsertPatientAsync(patientDTO);
-            if(returnValue.Value.GetType() == typeof(DisconnectFromDatabase))
+
+            if(returnValue.Value.GetType() == typeof(DatabaseException))
             {
-                return Problem("Cannot connect to the database, please contact Admin@test.com");
+                return Problem("Cannot connect to the database, please contact Admin@admin.admin | "+
+                    $"See inner exception: {returnValue.AsT1._message}");
             }
             return Ok("New user has been created");
         }

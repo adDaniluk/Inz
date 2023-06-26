@@ -20,14 +20,18 @@ namespace Inz.Repository
             await _dbContextApi.Patients.AddAsync(patient);
         }
 
-        public async Task<OneOf<Patient, DisconnectFromDatabase>> SaveChangesAsync()
+        public async Task<OneOf<Patient, DatabaseException>> SaveChangesAsync()
         {
-            if (_dbContextApi.Database.CanConnect())
+            try
             {
                 await _dbContextApi.SaveChangesAsync();
-                return new Patient();
             }
-            return new DisconnectFromDatabase();
+            catch (Exception e)
+            {
+                return new DatabaseException(e);
+            }
+
+            return new Patient();
         }
         
 

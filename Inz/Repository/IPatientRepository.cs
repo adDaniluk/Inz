@@ -7,6 +7,6 @@ namespace Inz.Repository
     public interface IPatientRepository
     {
         public Task InsertNewPatientAsync(Patient patient);
-        public Task<OneOf<Patient, DisconnectFromDatabase>> SaveChangesAsync();
+        public Task<OneOf<Patient, DatabaseException>> SaveChangesAsync();
     }
 }

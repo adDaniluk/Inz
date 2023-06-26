@@ -2,6 +2,8 @@
 using Inz.Model;
 using Inz.OneOfHelper;
 using Inz.Repository;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 using OneOf;
 
 namespace Inz.Services
@@ -15,7 +17,7 @@ namespace Inz.Services
             _patientRepository = patientRepository;
         }
 
-        public async Task<OneOf<Patient, DisconnectFromDatabase>> InsertPatientAsync(PatientDTO patientDTO)
+        public async Task<OneOf<Patient, DatabaseException>> InsertPatientAsync(PatientDTO patientDTO)
         {
             Address address = new Address()
             {
@@ -42,20 +44,11 @@ namespace Inz.Services
             };
 
             await _patientRepository.InsertNewPatientAsync(patient);
-            var returnValue = await _patientRepository.SaveChangesAsync();
+            OneOf<Patient, DatabaseException> returnValue = await _patientRepository.SaveChangesAsync();
 
-            if(returnValue.Value.GetType() == typeof(DisconnectFromDatabase))
-            {
-                return new DisconnectFromDatabase();
-            }
-
-            return new Patient();
-        }
-
-        public async Task ValidateUser()
-        {
-            Task t = Task.Delay(1);
-            await t;
+            return returnValue.Match(
+                patinet => new Patient(),
+                databaseException => returnValue);
         }
     }
 }

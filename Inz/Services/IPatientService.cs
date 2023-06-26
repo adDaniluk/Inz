@@ -7,7 +7,6 @@ namespace Inz.Services
 {
     public interface IPatientService
     {
-        public Task<OneOf<Patient, DisconnectFromDatabase>> InsertPatientAsync(PatientDTO patientDTO);
-        public Task ValidateUser();
+        public Task<OneOf<Patient, DatabaseException>> InsertPatientAsync(PatientDTO patientDTO);
     }
 }
