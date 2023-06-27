@@ -1,7 +1,6 @@
 ﻿using Inz.Context;
 using Inz.Model;
 using Inz.OneOfHelper;
-using Microsoft.Data.SqlClient;
 using OneOf;
 
 namespace Inz.Repository

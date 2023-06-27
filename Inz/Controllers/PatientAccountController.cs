@@ -21,12 +21,12 @@ namespace Inz.Controllers
         {
             var returnValue = await _patientService.InsertPatientAsync(patientDTO);
 
-            if(returnValue.Value.GetType() == typeof(DatabaseException))
-            {
-                return Problem("Cannot connect to the database, please contact Admin@admin.admin | "+
-                    $"See inner exception: {returnValue.AsT1._message}");
-            }
-            return Ok("New user has been created");
+            IActionResult actionResult = returnValue.Match(
+                Patient => Ok("New user has been created"),
+                DatabaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
+                    $"See inner exception: {DatabaseException.exception.Message}"));
+
+            return actionResult;
         }
 
     }

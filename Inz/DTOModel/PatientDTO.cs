@@ -1,5 +1,4 @@
-﻿using Inz.Model;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Inz.DTOModel
 {
@@ -17,6 +16,7 @@ namespace Inz.DTOModel
         public string Name { get; set; } = null!;
         [MaxLength(100)] 
         public string Surname { get; set; } = null!;
+        [Required]
         public DateTime DateOfBirth { get; set; }
         [MaxLength(100)] 
         public string Street { get; set; } = null!;

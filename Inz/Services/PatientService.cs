@@ -2,8 +2,6 @@
 using Inz.Model;
 using Inz.OneOfHelper;
 using Inz.Repository;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.EntityFrameworkCore;
 using OneOf;
 
 namespace Inz.Services
