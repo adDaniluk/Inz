@@ -52,5 +52,9 @@ namespace Inz.Repository
             return false;
         }
 
+        public async Task UpdatePatientAsync(Patient patient)
+        {
+           // update patient
+        }
     }
 }

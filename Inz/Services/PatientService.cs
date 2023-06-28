@@ -4,6 +4,7 @@ using Inz.OneOfHelper;
 using Inz.Repository;
 using OneOf;
 using OneOf.Types;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Inz.Services
 {
@@ -55,18 +56,20 @@ namespace Inz.Services
             
             var checkPatient = await _patientRepository.CheckIfPatientExistAsync(id);
 
+
             if(checkPatient.Value is true)
             {
-
+                await _patientRepository.UpdatePatientAsync(new Patient());
+                await _patientRepository.SaveChangesAsync();
+                return new Patient();
             }
 
             if(checkPatient.Value is false)
             {
-
-
+                return new NotFound();
             }
 
-            return new Patient();
+            return checkPatient.AsT1;
 
         }
     }
