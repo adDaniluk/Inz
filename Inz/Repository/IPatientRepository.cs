@@ -8,5 +8,6 @@ namespace Inz.Repository
     {
         public Task InsertNewPatientAsync(Patient patient);
         public Task<OneOf<Patient, DatabaseException>> SaveChangesAsync();
+        public Task<OneOf<bool, DatabaseException>> CheckIfPatientExistAsync(int id);
     }
 }

@@ -3,6 +3,7 @@ using Inz.Model;
 using Inz.OneOfHelper;
 using Inz.Repository;
 using OneOf;
+using OneOf.Types;
 
 namespace Inz.Services
 {
@@ -47,6 +48,26 @@ namespace Inz.Services
             return returnValue.Match(
                 patinet => new Patient(),
                 databaseException => returnValue);
+        }
+
+        public async Task<OneOf<Patient, NotFound, DatabaseException>> UpdatePatientAsync(PatientDTO patientDTO, int id)
+        {
+            
+            var checkPatient = await _patientRepository.CheckIfPatientExistAsync(id);
+
+            if(checkPatient.Value is true)
+            {
+
+            }
+
+            if(checkPatient.Value is false)
+            {
+
+
+            }
+
+            return new Patient();
+
         }
     }
 }

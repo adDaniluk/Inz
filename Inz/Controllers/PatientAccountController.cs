@@ -22,12 +22,26 @@ namespace Inz.Controllers
             var returnValue = await _patientService.InsertPatientAsync(patientDTO);
 
             IActionResult actionResult = returnValue.Match(
-                Patient => Ok("New user has been created"),
-                DatabaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
-                    $"See inner exception: {DatabaseException.exception.Message}"));
+                patient => Ok("New user has been created"),
+                databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
+                    $"See inner exception: {databaseException.exception.Message}"));
 
             return actionResult;
         }
 
+        [Route("api/[controller]/{id}")]
+        [HttpPut]
+        public async Task<IActionResult> UpdatePatientAsync(PatientDTO patientDTO, int id)
+        {
+            var returnValue = await _patientService.UpdatePatientAsync(patientDTO, id);
+
+            IActionResult actionResult = returnValue.Match(
+                patient => Ok("User has been updated"),
+                notFound => NotFound($"User with {id} does not exist."),
+                databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
+                    $"See inner exception: {databaseException.exception.Message}"));
+
+            return actionResult;
+        }
     }
 }
