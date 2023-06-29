@@ -13,7 +13,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<DbContextApi>(option => option.UseSqlServer(
-    builder.Configuration.GetSection("ConnectionDbStrings")["WebApplication3Context?"]));
+    builder.Configuration.GetSection("ConnectionDbStrings")["WebApplication3Context"]));
 
 builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();

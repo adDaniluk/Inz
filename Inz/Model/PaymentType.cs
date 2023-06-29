@@ -7,6 +7,6 @@ namespace Inz.Model
         public int Id { get; set; }
         [MaxLength(100)]
         public string TypeName { get; set; } = null!;
-        public ICollection<DoctorVisit> DoctorVisits { get; set; } = new List<DoctorVisit>();
+        public virtual ICollection<DoctorVisit> DoctorVisits { get; set; } = new List<DoctorVisit>();
     }
 }

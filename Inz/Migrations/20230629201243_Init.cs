@@ -129,7 +129,7 @@ namespace Inz.Migrations
                 name: "Doctors",
                 columns: table => new
                 {
-                    DoctorId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LicenseNumber = table.Column<int>(type: "int", nullable: false),
                     Biography = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -138,17 +138,18 @@ namespace Inz.Migrations
                     AlterTimestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DeleteTimestamp = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsDeleted = table.Column<int>(type: "int", nullable: false),
-                    Login = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Surname = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Login = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Phone = table.Column<int>(type: "int", nullable: false),
+                    DateOfBirth = table.Column<DateTime>(type: "Date", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Doctors", x => x.DoctorId);
+                    table.PrimaryKey("PK_Doctors", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Doctors_Addresses_AddressId",
                         column: x => x.AddressId,
@@ -161,24 +162,25 @@ namespace Inz.Migrations
                 name: "Patients",
                 columns: table => new
                 {
-                    PatientId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AddressId = table.Column<int>(type: "int", nullable: false),
                     Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
                     AlterTimestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DeleteTimestamp = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsDeleted = table.Column<int>(type: "int", nullable: false),
-                    Login = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Surname = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Login = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Phone = table.Column<int>(type: "int", nullable: false),
+                    DateOfBirth = table.Column<DateTime>(type: "Date", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Patients", x => x.PatientId);
+                    table.PrimaryKey("PK_Patients", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Patients_Addresses_AddressId",
                         column: x => x.AddressId,
@@ -207,7 +209,7 @@ namespace Inz.Migrations
                         name: "FK_CuredDiseases_Doctors_DoctorId",
                         column: x => x.DoctorId,
                         principalTable: "Doctors",
-                        principalColumn: "DoctorId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -225,7 +227,7 @@ namespace Inz.Migrations
                         name: "FK_DoctorMedicalSpecializations_Doctors_DoctorId",
                         column: x => x.DoctorId,
                         principalTable: "Doctors",
-                        principalColumn: "DoctorId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_DoctorMedicalSpecializations_MedicalSpecializations_MedicalSpecializationId",
@@ -250,7 +252,7 @@ namespace Inz.Migrations
                         name: "FK_DoctorServices_Doctors_DoctorId",
                         column: x => x.DoctorId,
                         principalTable: "Doctors",
-                        principalColumn: "DoctorId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_DoctorServices_Services_ServiceId",
@@ -286,13 +288,13 @@ namespace Inz.Migrations
                         name: "FK_Calendars_Doctors_DoctorId",
                         column: x => x.DoctorId,
                         principalTable: "Doctors",
-                        principalColumn: "DoctorId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Calendars_Patients_PatientId",
                         column: x => x.PatientId,
                         principalTable: "Patients",
-                        principalColumn: "PatientId");
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Calendars_Services_ServiceId",
                         column: x => x.ServiceId,

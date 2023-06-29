@@ -7,6 +7,6 @@ namespace Inz.Model
         public int Id { get; set; }
         [MaxLength(100)]
         public string StatusName { get; set; } = null!;
-        public ICollection<Calendar> Calendars { get; set; } = new List<Calendar>();
+        public virtual ICollection<Calendar> Calendars { get; set; } = new List<Calendar>();
     }
 }

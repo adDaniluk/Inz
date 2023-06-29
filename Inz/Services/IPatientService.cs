@@ -9,7 +9,6 @@ namespace Inz.Services
     public interface IPatientService
     {
         public Task<OneOf<Patient, DatabaseException>> InsertPatientAsync(PatientDTO patientDTO);
-
-        public Task<OneOf<Patient, NotFound, DatabaseException>> UpdatePatientAsync(UpdatePatientDTO patientDTO, int id);
+        public Task<OneOf<Patient, NotFound, DatabaseException>> ValidateAndUpdatePatientAsyc(UpdatePatientDTO updatePatientDTO);
     }
 }

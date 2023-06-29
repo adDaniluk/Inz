@@ -5,7 +5,8 @@ namespace Inz.Model
     public class MedicalSpecialization
     {
         public int Id { get; set; }
+        [MaxLength(100)]
         public string Name { get; set; } = null!;
-        public ICollection<DoctorMedicalSpecialization> DoctorMedicalSpecializations { get; set; } = new List<DoctorMedicalSpecialization> ();
+        public virtual ICollection<DoctorMedicalSpecialization> DoctorMedicalSpecializations { get; set; } = new List<DoctorMedicalSpecialization> ();
     }
 }

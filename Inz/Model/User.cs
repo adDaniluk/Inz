@@ -1,16 +1,27 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Inz.Model
 {
     public abstract class User : TimestampModel
     {
-        public string Login { get; set; } = null!;
-        public string Password { get; set; } = null!;
-        public string Email { get; set; } = null!;
-        public string Phone { get; set; } = null!;
+        [MaxLength(200)]
         public string Name { get; set; } = null!;
+        [MaxLength(200)]
         public string Surname { get; set; } = null!;
+        [MaxLength(50)]
+        public string Login { get; set; } = null!;
+        [MaxLength(100)]
+        public string Password { get; set; } = null!;
+        [Required]
+        public int UserId { get; set; }
+        [MaxLength(100)]
+        public string Email { get; set; } = null!;
+        [Required]
+        public int Phone { get; set; }
+        [Required]
+        [Column(TypeName = "Date")]
         public DateTime DateOfBirth { get; set; }
     }
 }

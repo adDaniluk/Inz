@@ -17,7 +17,7 @@ namespace Inz.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreatePatientAsync(PatientDTO patientDTO)
+        public async Task<IActionResult> InsertPatientAsync(PatientDTO patientDTO)
         {
             var returnValue = await _patientService.InsertPatientAsync(patientDTO);
 
@@ -33,7 +33,8 @@ namespace Inz.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdatePatientAsync(UpdatePatientDTO updatePatientDTO, int id)
         {
-            var returnValue = await _patientService.UpdatePatientAsync(updatePatientDTO, id);
+            updatePatientDTO.Id = id;
+            var returnValue = await _patientService.ValidateAndUpdatePatientAsyc(updatePatientDTO);
 
             IActionResult actionResult = returnValue.Match(
                 patient => Ok("User has been updated"),

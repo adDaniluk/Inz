@@ -8,10 +8,13 @@ namespace Inz.DTOModel
         public string Login { get; set; } = null!;
         [MaxLength(100)]
         public string Password { get; set; } = null!;
+        [MaxLength(11)]
+        [MinLength(11)]
+        public int UserId { get; set; }
         [MaxLength(100)]
         public string Email { get; set; } = null!;
-        [MaxLength(100)]
-        public string Phone { get; set; } = null!;
+        [Required]
+        public int Phone { get; set; }
         [MaxLength(200)] 
         public string Name { get; set; } = null!;
         [MaxLength(100)] 

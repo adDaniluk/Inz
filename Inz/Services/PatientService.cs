@@ -43,7 +43,7 @@ namespace Inz.Services
                 Address = address
             };
 
-            await _patientRepository.InsertNewPatientAsync(patient);
+            await _patientRepository.InsertPatientAsync(patient);
             OneOf<Patient, DatabaseException> returnValue = await _patientRepository.SaveChangesAsync();
 
             return returnValue.Match(
@@ -51,39 +51,17 @@ namespace Inz.Services
                 databaseException => returnValue);
         }
 
-        public async Task<OneOf<Patient, NotFound, DatabaseException>> UpdatePatientAsync(UpdatePatientDTO updatePatientDTO, int id)
+        public async Task<OneOf<Patient, NotFound, DatabaseException>> ValidateAndUpdatePatientAsyc(UpdatePatientDTO updatePatientDTO)
         {
-            
-            var checkPatient = await _patientRepository.CheckIfPatientExistAsync(id);
+            var returnValue = await _patientRepository.ValidateAndUpdatePatientAsyc(updatePatientDTO);
 
+            returnValue.Match(
+                patient => _patientRepository.SaveChangesAsync(), //TODO await???
+                notFound => new NotFound(),
+                databaseException => returnValue.Value
+                );
 
-            //if(checkPatient.Value is true)
-            //{
-            //    await _patientRepository.UpdatePatientAsync(new Patient());
-            //    await _patientRepository.SaveChangesAsync();
-            //    return new Patient();
-            //}
-
-            //if(checkPatient.Value is false)
-            //{
-            //    return new NotFound();
-            //}
-
-            //return checkPatient.AsT1;
-
-            checkPatient.Match(
-                bool1 => bool1 ? 
-                ,
-                databaseException => checkPatient);
-        }
-
-        private async Task<OneOf<Patient, DatabaseException>> ValidateAndUpdatePatientAsyc(UpdatePatientDTO updatePatientDTO)
-        {
-            // getPatientById -> model patient <=> updatePatientDto -> 
-
-            await _patientRepository.UpdatePatientAsync(new Patient()); //updatePatientDTO
-            await _patientRepository.SaveChangesAsync();
-            return new Patient();
+            return returnValue;
         }
 
     }

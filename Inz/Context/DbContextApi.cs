@@ -8,7 +8,6 @@ namespace Inz.Context
         public DbContextApi(DbContextOptions options) : base(options)
         {
         }
-
         public DbSet<Patient> Patients { get; set; }
         public DbSet<Doctor> Doctors { get; set; }
         public DbSet<Address> Addresses { get; set; }
@@ -33,85 +32,85 @@ namespace Inz.Context
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Doctor>()
-                .HasOne(d => d.Address)
-                .WithOne(d => d.Doctor);
+            //modelBuilder.Entity<Doctor>()
+            //    .HasOne(d => d.Address)
+            //    .WithOne(d => d.Doctor);
 
-            modelBuilder.Entity<Doctor>()
-                .HasMany(d => d.Calendars)
-                .WithOne(d => d.Doctor);
+            //modelBuilder.Entity<Doctor>()
+            //    .HasMany(d => d.Calendars)
+            //    .WithOne(d => d.Doctor);
 
-            modelBuilder.Entity<Doctor>()
-                .HasMany(d => d.DoctorServices)
-                .WithOne(ds => ds.Doctor);
+            //modelBuilder.Entity<Doctor>()
+            //    .HasMany(d => d.DoctorServices)
+            //    .WithOne(ds => ds.Doctor);
         
-            modelBuilder.Entity<Patient>()
-                .HasOne(p => p.Address)
-                .WithOne(a => a.Patient);
+            //modelBuilder.Entity<Patient>()
+            //    .HasOne(p => p.Address)
+            //    .WithOne(a => a.Patient);
 
-            modelBuilder.Entity<Patient>()
-                .HasMany(p => p.Calendars)
-                .WithOne(c => c.Patient);
+            //modelBuilder.Entity<Patient>()
+            //    .HasMany(p => p.Calendars)
+            //    .WithOne(c => c.Patient);
 
-            modelBuilder.Entity<Doctor>()
-                .HasMany(d => d.DoctorMedicalSpecializations)
-                .WithOne(dms => dms.Doctor);
+            //modelBuilder.Entity<Doctor>()
+            //    .HasMany(d => d.DoctorMedicalSpecializations)
+            //    .WithOne(dms => dms.Doctor);
 
-            modelBuilder.Entity<Status>()
-                .HasMany(s => s.Calendars)
-                .WithOne(c => c.Status);
+            //modelBuilder.Entity<Status>()
+            //    .HasMany(s => s.Calendars)
+            //    .WithOne(c => c.Status);
 
-            modelBuilder.Entity<Service>()
-                .HasMany(s => s.DoctorServices)
-                .WithOne(ds => ds.Service);
+            //modelBuilder.Entity<Service>()
+            //    .HasMany(s => s.DoctorServices)
+            //    .WithOne(ds => ds.Service);
 
-            modelBuilder.Entity<MedicalSpecialization>()
-                .HasMany(ms => ms.DoctorMedicalSpecializations)
-                .WithOne(dms => dms.MedicalSpecialization);
+            //modelBuilder.Entity<MedicalSpecialization>()
+            //    .HasMany(ms => ms.DoctorMedicalSpecializations)
+            //    .WithOne(dms => dms.MedicalSpecialization);
 
-            modelBuilder.Entity<Service>()
-                .HasMany(s => s.Calendars)
-                .WithOne(c => c.Service);
+            //modelBuilder.Entity<Service>()
+            //    .HasMany(s => s.Calendars)
+            //    .WithOne(c => c.Service);
 
-            modelBuilder.Entity<Doctor>()
-                .HasMany(d => d.CuredDiseases)
-                .WithOne(cd => cd.Doctor);
+            //modelBuilder.Entity<Doctor>()
+            //    .HasMany(d => d.CuredDiseases)
+            //    .WithOne(cd => cd.Doctor);
 
-            modelBuilder.Entity<Disease>()
-                .HasMany(d => d.CuredDiseases)
-                .WithOne(cd => cd.Disease);
+            //modelBuilder.Entity<Disease>()
+            //    .HasMany(d => d.CuredDiseases)
+            //    .WithOne(cd => cd.Disease);
 
-            modelBuilder.Entity<Disease>()
-                .HasMany(d => d.DiseaseSuspicions)
-                .WithOne(ds => ds.Disease);
+            //modelBuilder.Entity<Disease>()
+            //    .HasMany(d => d.DiseaseSuspicions)
+            //    .WithOne(ds => ds.Disease);
 
-            modelBuilder.Entity<DoctorVisit>()
-                .HasMany(dv => dv.DiseaseSuspicions)
-                .WithOne(ds => ds.DoctorVisit);
+            //modelBuilder.Entity<DoctorVisit>()
+            //    .HasMany(dv => dv.DiseaseSuspicions)
+            //    .WithOne(ds => ds.DoctorVisit);
 
-            modelBuilder.Entity<DoctorVisit>()
-                .HasMany(dv => dv.Referrals)
-                .WithOne(r => r.DoctorVisit);
+            //modelBuilder.Entity<DoctorVisit>()
+            //    .HasMany(dv => dv.Referrals)
+            //    .WithOne(r => r.DoctorVisit);
 
-            modelBuilder.Entity<PaymentType>()
-                .HasMany(pt => pt.DoctorVisits)
-                .WithOne(dv => dv.PaymentType);
+            //modelBuilder.Entity<PaymentType>()
+            //    .HasMany(pt => pt.DoctorVisits)
+            //    .WithOne(dv => dv.PaymentType);
 
-            modelBuilder.Entity<TimeBlock>()
-                .HasMany(tb => tb.Calendars)
-                .WithOne(c => c.TimeBlock);
+            //modelBuilder.Entity<TimeBlock>()
+            //    .HasMany(tb => tb.Calendars)
+            //    .WithOne(c => c.TimeBlock);
 
-            modelBuilder.Entity<Medicine>()
-                .HasMany(m => m.ReceiptMedicines)
-                .WithOne(rm => rm.Medicine);
+            //modelBuilder.Entity<Medicine>()
+            //    .HasMany(m => m.ReceiptMedicines)
+            //    .WithOne(rm => rm.Medicine);
 
-            modelBuilder.Entity<Receipt>()
-                .HasMany(r => r.ReceiptMedicines)
-                .WithOne(rm => rm.Receipt);
+            //modelBuilder.Entity<Receipt>()
+            //    .HasMany(r => r.ReceiptMedicines)
+            //    .WithOne(rm => rm.Receipt);
 
-            modelBuilder.Entity<Receipt>()
-                .HasOne(r => r.DoctorVisit)
-                .WithOne(dv => dv.Receipt);
+            //modelBuilder.Entity<Receipt>()
+            //    .HasOne(r => r.DoctorVisit)
+            //    .WithOne(dv => dv.Receipt);
 
             modelBuilder.Entity<Calendar>()
                 .HasOne(c => c.DoctorVisit)
@@ -135,113 +134,113 @@ namespace Inz.Context
 
 //Modlbuilder Annotations
 
-            modelBuilder.Entity<Address>()
-                .Property(a => a.Street)
-                .HasMaxLength(100);
+            //modelBuilder.Entity<Address>()
+            //    .Property(a => a.Street)
+            //    .HasMaxLength(100);
 
-            modelBuilder.Entity<Address>()
-                .Property(a => a.City)
-                .HasMaxLength(100);
+            //modelBuilder.Entity<Address>()
+            //    .Property(a => a.City)
+            //    .HasMaxLength(100);
 
-            modelBuilder.Entity<Address>()
-                .Property(a => a.PostCode)
-                .HasMaxLength(6);
+            //modelBuilder.Entity<Address>()
+            //    .Property(a => a.PostCode)
+            //    .HasMaxLength(6);
 
-            modelBuilder.Entity<Address>()
-                .Property(a => a.PostCode)
-                .HasMaxLength(6);
+            //modelBuilder.Entity<Address>()
+            //    .Property(a => a.PostCode)
+            //    .HasMaxLength(6);
 
-            modelBuilder.Entity<Disease>()
-                .Property(d => d.Name)
-                .HasMaxLength(200);
+            //modelBuilder.Entity<Disease>()
+            //    .Property(d => d.Name)
+            //    .HasMaxLength(200);
 
-            modelBuilder.Entity<DoctorVisit>()
-                .Property(dv => dv.EndHour)
-                .HasMaxLength(10);
+            //modelBuilder.Entity<DoctorVisit>()
+            //    .Property(dv => dv.EndHour)
+            //    .HasMaxLength(10);
 
-            modelBuilder.Entity<DoctorVisit>()
-                .Property(dv => dv.RatingNote)
-                .HasMaxLength(200);
+            //modelBuilder.Entity<DoctorVisit>()
+            //    .Property(dv => dv.RatingNote)
+            //    .HasMaxLength(200);
 
-            modelBuilder.Entity<MedicalSpecialization>()
-                .Property(ms => ms.Name)
-                .HasMaxLength(100);
+            //modelBuilder.Entity<MedicalSpecialization>()
+            //    .Property(ms => ms.Name)
+            //    .HasMaxLength(100);
 
-            modelBuilder.Entity<Medicine>()
-                .Property(m => m.Name)
-                .HasMaxLength(100);
+            //modelBuilder.Entity<Medicine>()
+            //    .Property(m => m.Name)
+            //    .HasMaxLength(100);
 
-            modelBuilder.Entity<PaymentType>()
-               .Property(pt => pt.TypeName)
-               .HasMaxLength(100);
+            //modelBuilder.Entity<PaymentType>()
+            //   .Property(pt => pt.TypeName)
+            //   .HasMaxLength(100);
 
-            modelBuilder.Entity<Service>()
-               .Property(s => s.Description)
-               .HasMaxLength(200);
+            //modelBuilder.Entity<Service>()
+            //   .Property(s => s.Description)
+            //   .HasMaxLength(200);
 
-            modelBuilder.Entity<Service>()
-               .Property(s => s.Name)
-               .HasMaxLength(200);
+            //modelBuilder.Entity<Service>()
+            //   .Property(s => s.Name)
+            //   .HasMaxLength(200);
 
-            modelBuilder.Entity<Status>()
-               .Property(s => s.StatusName)
-               .HasMaxLength(100);
+            //modelBuilder.Entity<Status>()
+            //   .Property(s => s.StatusName)
+            //   .HasMaxLength(100);
 
-            modelBuilder.Entity<TimeBlock>()
-               .Property(tb => tb.StartHour)
-               .HasMaxLength(10);
+            //modelBuilder.Entity<TimeBlock>()
+            //   .Property(tb => tb.StartHour)
+            //   .HasMaxLength(10);
 
-            modelBuilder.Entity<TimeBlock>()
-              .Property(tb => tb.EndHour)
-              .HasMaxLength(10);
+            //modelBuilder.Entity<TimeBlock>()
+            //  .Property(tb => tb.EndHour)
+            //  .HasMaxLength(10);
 
-            modelBuilder.Entity<Doctor>()
-                .Property(d => d.Login)
-                .HasMaxLength(50);
+            //modelBuilder.Entity<Doctor>()
+            //    .Property(d => d.Login)
+            //    .HasMaxLength(50);
 
-            modelBuilder.Entity<Doctor>()
-                .Property(d => d.Password)
-                .HasMaxLength(100);
+            //modelBuilder.Entity<Doctor>()
+            //    .Property(d => d.Password)
+            //    .HasMaxLength(100);
 
-            modelBuilder.Entity<Doctor>()
-                .Property(d => d.Email)
-                .HasMaxLength(100);
+            //modelBuilder.Entity<Doctor>()
+            //    .Property(d => d.Email)
+            //    .HasMaxLength(100);
 
-            modelBuilder.Entity<Doctor>()
-                .Property(d => d.Phone)
-                .HasMaxLength(100);
+            //modelBuilder.Entity<Doctor>()
+            //    .Property(d => d.Phone)
+            //    .HasMaxLength(100);
 
-            modelBuilder.Entity<Doctor>()
-                .Property(d => d.Name)
-                .HasMaxLength(200);
+            //modelBuilder.Entity<Doctor>()
+            //    .Property(d => d.Name)
+            //    .HasMaxLength(200);
 
-            modelBuilder.Entity<Doctor>()
-                .Property(d => d.Surname)
-                .HasMaxLength(200);
+            //modelBuilder.Entity<Doctor>()
+            //    .Property(d => d.Surname)
+            //    .HasMaxLength(200);
 
-            modelBuilder.Entity<Patient>()
-                .Property(d => d.Login)
-                .HasMaxLength(50);
+            //modelBuilder.Entity<Patient>()
+            //    .Property(d => d.Login)
+            //    .HasMaxLength(50);
 
-            modelBuilder.Entity<Patient>()
-                .Property(d => d.Password)
-                .HasMaxLength(100);
+            //modelBuilder.Entity<Patient>()
+            //    .Property(d => d.Password)
+            //    .HasMaxLength(100);
 
-            modelBuilder.Entity<Patient>()
-                .Property(d => d.Email)
-                .HasMaxLength(100);
+            //modelBuilder.Entity<Patient>()
+            //    .Property(d => d.Email)
+            //    .HasMaxLength(100);
 
-            modelBuilder.Entity<Patient>()
-                .Property(d => d.Phone)
-                .HasMaxLength(100);
+            //modelBuilder.Entity<Patient>()
+            //    .Property(d => d.Phone)
+            //    .HasMaxLength(100);
 
-            modelBuilder.Entity<Patient>()
-                .Property(d => d.Name)
-                .HasMaxLength(200);
+            //modelBuilder.Entity<Patient>()
+            //    .Property(d => d.Name)
+            //    .HasMaxLength(200);
 
-            modelBuilder.Entity<Patient>()
-                .Property(d => d.Surname)
-                .HasMaxLength(200);
+            //modelBuilder.Entity<Patient>()
+            //    .Property(d => d.Surname)
+            //    .HasMaxLength(200);
         }
     }
 }

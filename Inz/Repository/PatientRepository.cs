@@ -1,4 +1,5 @@
 ﻿using Inz.Context;
+using Inz.DTOModel;
 using Inz.Model;
 using Inz.OneOfHelper;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +17,7 @@ namespace Inz.Repository
             _dbContextApi = dbContext;
         }
 
-        public async Task InsertNewPatientAsync(Patient patient)
+        public async Task InsertPatientAsync(Patient patient)
         {
             await _dbContextApi.Patients.AddAsync(patient);
         }
@@ -34,47 +35,25 @@ namespace Inz.Repository
             return new Patient();
         }
 
-        public async Task<OneOf<bool, DatabaseException>> CheckIfPatientExistAsync(int id)
+        public async Task<OneOf<Patient, NotFound, DatabaseException>> ValidateAndUpdatePatientAsyc(UpdatePatientDTO updatePatientDTO)
         {
             try
             {
-                var patientCheck = await _dbContextApi.Patients.FindAsync(id);
-
-                if (patientCheck != null)
-                {
-                    return true;
-                }
-
-            }catch(Exception e)
-            {
-                return new DatabaseException(e);
-            }
-
-            return false;
-        }
-
-        public async Task<OneOf<Patient, NotFound, DatabaseException>> UpdatePatientAsync(Patient patient)
-        {
-            try
-            {
-                var patientToUpdate = await _dbContextApi.Patients.Include(x => x.Address).SingleOrDefaultAsync(x => x.PatientId == patient.PatientId);
+                var patientToUpdate = await _dbContextApi.Patients.Include(x => x.Address).SingleOrDefaultAsync(x => x.Id == updatePatientDTO.Id);
 
                 if (patientToUpdate == null)
                 {
                     return new NotFound();
                 }
 
-                //TODO: mapowanie z DTO do pacjenta 
-                //TODO: zmiana na wszystkich encji Id
-                //patientToUpdate.Surname = patient.Surname;
-
-                //_dbContextApi.Attach(patient);
-                //_dbContextApi.Entry(patient).Property(x => x.Email).IsModified = true;
-                //_dbContextApi.SaveChanges();
-
-                //await _dbContextApi.Patients.Update(patient);
-
-                return patient;
+                patientToUpdate.Email = updatePatientDTO.Email;
+                patientToUpdate.Phone = updatePatientDTO.Phone;
+                patientToUpdate.Address.Street = updatePatientDTO.Street;
+                patientToUpdate.Address.City = updatePatientDTO.City;
+                patientToUpdate.Address.PostCode = updatePatientDTO.PostCode;
+                patientToUpdate.Address.AparmentNumber = updatePatientDTO.AparmentNumber;
+                
+                return patientToUpdate;
 
             }catch(Exception exception)
             {
