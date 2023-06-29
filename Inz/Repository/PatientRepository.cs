@@ -1,6 +1,7 @@
 ﻿using Inz.Context;
 using Inz.Model;
 using Inz.OneOfHelper;
+using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
 
@@ -52,9 +53,33 @@ namespace Inz.Repository
             return false;
         }
 
-        public async Task UpdatePatientAsync(Patient patient)
+        public async Task<OneOf<Patient, NotFound, DatabaseException>> UpdatePatientAsync(Patient patient)
         {
-           // update patient
+            try
+            {
+                var patientToUpdate = await _dbContextApi.Patients.Include(x => x.Address).SingleOrDefaultAsync(x => x.PatientId == patient.PatientId);
+
+                if (patientToUpdate == null)
+                {
+                    return new NotFound();
+                }
+
+                //TODO: mapowanie z DTO do pacjenta 
+                //TODO: zmiana na wszystkich encji Id
+                //patientToUpdate.Surname = patient.Surname;
+
+                //_dbContextApi.Attach(patient);
+                //_dbContextApi.Entry(patient).Property(x => x.Email).IsModified = true;
+                //_dbContextApi.SaveChanges();
+
+                //await _dbContextApi.Patients.Update(patient);
+
+                return patient;
+
+            }catch(Exception exception)
+            {
+                return new DatabaseException(exception);
+            }
         }
     }
 }

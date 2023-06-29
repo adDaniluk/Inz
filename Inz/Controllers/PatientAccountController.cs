@@ -31,9 +31,9 @@ namespace Inz.Controllers
 
         [Route("api/[controller]/{id}")]
         [HttpPut]
-        public async Task<IActionResult> UpdatePatientAsync(PatientDTO patientDTO, int id)
+        public async Task<IActionResult> UpdatePatientAsync(UpdatePatientDTO updatePatientDTO, int id)
         {
-            var returnValue = await _patientService.UpdatePatientAsync(patientDTO, id);
+            var returnValue = await _patientService.UpdatePatientAsync(updatePatientDTO, id);
 
             IActionResult actionResult = returnValue.Match(
                 patient => Ok("User has been updated"),

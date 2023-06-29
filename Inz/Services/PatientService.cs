@@ -51,26 +51,40 @@ namespace Inz.Services
                 databaseException => returnValue);
         }
 
-        public async Task<OneOf<Patient, NotFound, DatabaseException>> UpdatePatientAsync(PatientDTO patientDTO, int id)
+        public async Task<OneOf<Patient, NotFound, DatabaseException>> UpdatePatientAsync(UpdatePatientDTO updatePatientDTO, int id)
         {
             
             var checkPatient = await _patientRepository.CheckIfPatientExistAsync(id);
 
 
-            if(checkPatient.Value is true)
-            {
-                await _patientRepository.UpdatePatientAsync(new Patient());
-                await _patientRepository.SaveChangesAsync();
-                return new Patient();
-            }
+            //if(checkPatient.Value is true)
+            //{
+            //    await _patientRepository.UpdatePatientAsync(new Patient());
+            //    await _patientRepository.SaveChangesAsync();
+            //    return new Patient();
+            //}
 
-            if(checkPatient.Value is false)
-            {
-                return new NotFound();
-            }
+            //if(checkPatient.Value is false)
+            //{
+            //    return new NotFound();
+            //}
 
-            return checkPatient.AsT1;
+            //return checkPatient.AsT1;
 
+            checkPatient.Match(
+                bool1 => bool1 ? 
+                ,
+                databaseException => checkPatient);
         }
+
+        private async Task<OneOf<Patient, DatabaseException>> ValidateAndUpdatePatientAsyc(UpdatePatientDTO updatePatientDTO)
+        {
+            // getPatientById -> model patient <=> updatePatientDto -> 
+
+            await _patientRepository.UpdatePatientAsync(new Patient()); //updatePatientDTO
+            await _patientRepository.SaveChangesAsync();
+            return new Patient();
+        }
+
     }
 }
