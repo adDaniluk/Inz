@@ -2,6 +2,7 @@
 using Inz.Model;
 using Inz.OneOfHelper;
 using Inz.Repository;
+using Microsoft.EntityFrameworkCore.Metadata;
 using OneOf;
 using OneOf.Types;
 using System.Reflection.Metadata.Ecma335;
@@ -19,15 +20,15 @@ namespace Inz.Services
 
         public async Task<OneOf<Patient, DatabaseException>> InsertPatientAsync(PatientDTO patientDTO)
         {
-            Address address = new Address()
-            {
-                Street = patientDTO.Street,
-                City = patientDTO.City,
-                PostCode = patientDTO.PostCode,
-                AparmentNumber = patientDTO.AparmentNumber,
-                Timestamp = DateTime.Now,
-                AlterTimestamp = DateTime.Now
-            };
+            //Address address = new Address()
+            //{
+            //    Street = patientDTO.Street,
+            //    City = patientDTO.City,
+            //    PostCode = patientDTO.PostCode,
+            //    AparmentNumber = patientDTO.AparmentNumber,
+            //    Timestamp = DateTime.Now,
+            //    AlterTimestamp = DateTime.Now
+            //};
 
             Patient patient = new Patient()
             {
@@ -40,8 +41,16 @@ namespace Inz.Services
                 DateOfBirth = patientDTO.DateOfBirth.Date,
                 Timestamp = DateTime.Now,
                 AlterTimestamp = DateTime.Now,
-                Address = address
-            };
+                Address = new Address()
+                {
+                    Street = patientDTO.Street,
+                    City = patientDTO.City,
+                    PostCode = patientDTO.PostCode,
+                    AparmentNumber = patientDTO.AparmentNumber,
+                    Timestamp = DateTime.Now,
+                    AlterTimestamp = DateTime.Now
+                }
+        };
 
             await _patientRepository.InsertPatientAsync(patient);
             OneOf<Patient, DatabaseException> returnValue = await _patientRepository.SaveChangesAsync();
@@ -56,13 +65,11 @@ namespace Inz.Services
             var returnValue = await _patientRepository.ValidateAndUpdatePatientAsyc(updatePatientDTO);
 
             returnValue.Match(
-                patient => _patientRepository.SaveChangesAsync(), //TODO await???
+                patient => patient,
                 notFound => new NotFound(),
-                databaseException => returnValue.Value
-                );
+                databaseException => returnValue);
 
             return returnValue;
         }
-
     }
 }

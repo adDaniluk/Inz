@@ -53,6 +53,8 @@ namespace Inz.Repository
                 patientToUpdate.Address.PostCode = updatePatientDTO.PostCode;
                 patientToUpdate.Address.AparmentNumber = updatePatientDTO.AparmentNumber;
                 
+                await _dbContextApi.SaveChangesAsync();
+
                 return patientToUpdate;
 
             }catch(Exception exception)

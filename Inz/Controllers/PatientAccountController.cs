@@ -1,4 +1,5 @@
 ﻿using Inz.DTOModel;
+using Inz.DTOModel.Validators;
 using Inz.OneOfHelper;
 using Inz.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +35,15 @@ namespace Inz.Controllers
         public async Task<IActionResult> UpdatePatientAsync(UpdatePatientDTO updatePatientDTO, int id)
         {
             updatePatientDTO.Id = id;
+
+            UpdatePatientDTOValidator updatePatientDTOValidator = new UpdatePatientDTOValidator();
+            var validatorResult = updatePatientDTOValidator.Validate(updatePatientDTO);
+
+            if (!validatorResult.IsValid)
+            {
+                return BadRequest(validatorResult.Errors);
+            }
+
             var returnValue = await _patientService.ValidateAndUpdatePatientAsyc(updatePatientDTO);
 
             IActionResult actionResult = returnValue.Match(
