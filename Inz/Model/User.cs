@@ -1,5 +1,4 @@
-﻿
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Inz.Model
@@ -14,8 +13,9 @@ namespace Inz.Model
         public string Login { get; set; } = null!;
         [MaxLength(100)]
         public string Password { get; set; } = null!;
-        [Required]
-        public int UserId { get; set; }
+        [MaxLength(11)]
+        [MinLength(11)]
+        public string UserId { get; set; } = null!;
         [MaxLength(100)]
         public string Email { get; set; } = null!;
         [Required]

@@ -1,5 +1,4 @@
-﻿
-namespace Inz.OneOfHelper
+﻿namespace Inz.OneOfHelper
 {
     public class DatabaseException
     {

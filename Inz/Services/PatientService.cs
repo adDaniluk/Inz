@@ -20,20 +20,12 @@ namespace Inz.Services
 
         public async Task<OneOf<Patient, DatabaseException>> InsertPatientAsync(PatientDTO patientDTO)
         {
-            //Address address = new Address()
-            //{
-            //    Street = patientDTO.Street,
-            //    City = patientDTO.City,
-            //    PostCode = patientDTO.PostCode,
-            //    AparmentNumber = patientDTO.AparmentNumber,
-            //    Timestamp = DateTime.Now,
-            //    AlterTimestamp = DateTime.Now
-            //};
 
             Patient patient = new Patient()
             {
                 Login = patientDTO.Login,
                 Password = patientDTO.Password,
+                UserId = patientDTO.UserId,
                 Email = patientDTO.Email,
                 Phone = patientDTO.Phone,
                 Name = patientDTO.Name,

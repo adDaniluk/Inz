@@ -3,6 +3,7 @@ using Inz.DTOModel.Validators;
 using Inz.OneOfHelper;
 using Inz.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 namespace Inz.Controllers
 {
@@ -20,10 +21,18 @@ namespace Inz.Controllers
         [HttpPost]
         public async Task<IActionResult> InsertPatientAsync(PatientDTO patientDTO)
         {
+            PatientDTOValidator patientDTOvalidator = new PatientDTOValidator();
+            var validatorResult = patientDTOvalidator.Validate(patientDTO);
+
+            if(!validatorResult.IsValid)
+            {
+                return BadRequest(validatorResult.Errors.ToList().Select(x => x.ErrorMessage));
+            }
+
             var returnValue = await _patientService.InsertPatientAsync(patientDTO);
 
             IActionResult actionResult = returnValue.Match(
-                patient => Ok("New user has been created"),
+                patient => Ok("New user has been created."),
                 databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
                     $"See inner exception: {databaseException.exception.Message}"));
 
@@ -41,13 +50,13 @@ namespace Inz.Controllers
 
             if (!validatorResult.IsValid)
             {
-                return BadRequest(validatorResult.Errors);
+                return BadRequest(validatorResult.Errors.ToList().Select(x => x.ErrorMessage));
             }
 
             var returnValue = await _patientService.ValidateAndUpdatePatientAsyc(updatePatientDTO);
 
             IActionResult actionResult = returnValue.Match(
-                patient => Ok("User has been updated"),
+                patient => Ok("User has been updated."),
                 notFound => NotFound($"User with {id} does not exist."),
                 databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
                     $"See inner exception: {databaseException.exception.Message}"));

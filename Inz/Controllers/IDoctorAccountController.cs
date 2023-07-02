@@ -6,5 +6,7 @@ namespace Inz.Controllers
     public interface IDoctorAccountController
     {
         public Task<IActionResult> CreateDoctorAsync(DoctorDTO doctorDTO);
+
+        public Task<IActionResult> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO, int id);
     }
 }

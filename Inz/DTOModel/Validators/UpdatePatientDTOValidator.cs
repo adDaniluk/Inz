@@ -6,14 +6,14 @@ namespace Inz.DTOModel.Validators
     {
         public UpdatePatientDTOValidator()
         { 
-            RuleFor(p => p.Id).NotEmpty();
-            RuleFor(p => p.City).NotNull().MaximumLength(100);
-            RuleFor(p => p.Email).NotNull().MaximumLength(100);
-            RuleFor(P => P.PostCode).NotNull().MaximumLength(6);
-            RuleFor(p => p.Phone).NotNull().GreaterThan(500000000).LessThan(1000000000);
-            RuleFor(p => p.Street).NotNull().MaximumLength(100);
-            RuleFor(p => p.AparmentNumber).NotNull();
-            RuleFor(p => p.PostCode).NotNull().Length(6);
+            RuleFor(p => p.Id).NotEmpty().NotNull();
+            RuleFor(p => p.City).NotNull().NotEmpty().Length(3, 100);
+            RuleFor(p => p.Email).NotNull().NotEmpty().EmailAddress();
+            RuleFor(P => P.PostCode).NotNull().NotEmpty().Length(6).Matches("[0-9]{2}-[0-9]{3}"); ;
+            RuleFor(p => p.Phone).NotNull().NotEmpty().InclusiveBetween(100000000, 999999999);
+            RuleFor(p => p.Street).NotNull().NotEmpty().Length(3, 200);
+            RuleFor(p => p.AparmentNumber).NotEmpty().NotNull();
+            RuleFor(p => p.PostCode).NotNull().NotEmpty().Length(6);
         }
     }
 }
