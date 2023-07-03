@@ -1,10 +1,7 @@
-﻿using FluentValidation;
-using Inz.DTOModel;
+﻿using Inz.DTOModel;
 using Inz.DTOModel.Validators;
-using Inz.OneOfHelper;
 using Inz.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Text;
 
 namespace Inz.Controllers
 {
@@ -40,7 +37,7 @@ namespace Inz.Controllers
             return actionResult;
         }
 
-        [Route("api/[controller]/{id}")]
+        [Route("api/[controller]/update")]
         [HttpPut]
         public async Task<IActionResult> UpdatePatientAsync(UpdatePatientDTO updatePatientDTO)
         {
@@ -53,7 +50,7 @@ namespace Inz.Controllers
                 return BadRequest(validatorResult.Errors.ToList().Select(x => x.ErrorMessage));
             }
 
-            var returnValue = await _patientService.ValidateAndUpdatePatientAsyc(updatePatientDTO);
+            var returnValue = await _patientService.UpdatePatientAsyc(updatePatientDTO);
 
             IActionResult actionResult = returnValue.Match(
                 patient => Ok("User has been updated."),

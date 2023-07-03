@@ -35,7 +35,7 @@ namespace Inz.Repository
             return new Patient();
         }
 
-        public async Task<OneOf<Patient, NotFound, DatabaseException>> ValidateAndUpdatePatientAsyc(UpdatePatientDTO updatePatientDTO)
+        public async Task<OneOf<Patient, NotFound, DatabaseException>> UpdatePatientAsyc(UpdatePatientDTO updatePatientDTO)
         {
             try
             {
@@ -52,6 +52,7 @@ namespace Inz.Repository
                 patientToUpdate.Address.City = updatePatientDTO.City;
                 patientToUpdate.Address.PostCode = updatePatientDTO.PostCode;
                 patientToUpdate.Address.AparmentNumber = updatePatientDTO.AparmentNumber;
+                patientToUpdate.AlterTimestamp = DateTime.Now;
                 
                 await _dbContextApi.SaveChangesAsync();
 

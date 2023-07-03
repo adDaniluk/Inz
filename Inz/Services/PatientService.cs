@@ -38,9 +38,7 @@ namespace Inz.Services
                     Street = patientDTO.Street,
                     City = patientDTO.City,
                     PostCode = patientDTO.PostCode,
-                    AparmentNumber = patientDTO.AparmentNumber,
-                    Timestamp = DateTime.Now,
-                    AlterTimestamp = DateTime.Now
+                    AparmentNumber = patientDTO.AparmentNumber
                 }
         };
 
@@ -52,9 +50,9 @@ namespace Inz.Services
                 databaseException => returnValue);
         }
 
-        public async Task<OneOf<Patient, NotFound, DatabaseException>> ValidateAndUpdatePatientAsyc(UpdatePatientDTO updatePatientDTO)
+        public async Task<OneOf<Patient, NotFound, DatabaseException>> UpdatePatientAsyc(UpdatePatientDTO updatePatientDTO)
         {
-            var returnValue = await _patientRepository.ValidateAndUpdatePatientAsyc(updatePatientDTO);
+            var returnValue = await _patientRepository.UpdatePatientAsyc(updatePatientDTO);
 
             returnValue.Match(
                 patient => patient,

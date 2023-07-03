@@ -10,6 +10,6 @@ namespace Inz.Repository
     {
         public Task InsertPatientAsync(Patient patient);
         public Task<OneOf<Patient, DatabaseException>> SaveChangesAsync();
-        public Task<OneOf<Patient, NotFound, DatabaseException>> ValidateAndUpdatePatientAsyc(UpdatePatientDTO updatePatientDTO);
+        public Task<OneOf<Patient, NotFound, DatabaseException>> UpdatePatientAsyc(UpdatePatientDTO updatePatientDTO);
     }
 }

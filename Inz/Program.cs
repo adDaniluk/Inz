@@ -18,6 +18,9 @@ builder.Services.AddDbContext<DbContextApi>(option => option.UseSqlServer(
 builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 
+builder.Services.AddScoped<IDoctorService, DoctorService>();
+builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

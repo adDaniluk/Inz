@@ -3,6 +3,7 @@ using Inz.Model;
 using Inz.OneOfHelper;
 using Inz.Repository;
 using OneOf;
+using OneOf.Types;
 
 namespace Inz.Services
 {
@@ -15,17 +16,8 @@ namespace Inz.Services
             _doctorRepository = doctorRepository;
         }
 
-        public async Task<OneOf<Doctor, DatabaseException>> InsertNewDoctorAsync(DoctorDTO doctorDTO)
+        public async Task<OneOf<Doctor, DatabaseException>> InsertDoctorAsync(DoctorDTO doctorDTO)
         {
-            Address address = new Address()
-            {
-                Street = doctorDTO.Street,
-                City = doctorDTO.City,
-                PostCode = doctorDTO.PostCode,
-                AparmentNumber = doctorDTO.AparmentNumber,
-                Timestamp = DateTime.Now,
-                AlterTimestamp = DateTime.Now
-            };
 
             Doctor doctor = new Doctor()
             {
@@ -37,15 +29,35 @@ namespace Inz.Services
                 Surname = doctorDTO.Surname,
                 DateOfBirth = doctorDTO.DateOfBirth,
                 Timestamp = DateTime.Now,
-                AlterTimestamp = DateTime.Now
+                AlterTimestamp = DateTime.Now,
+                Address = new Address()
+                {
+                    Street = doctorDTO.Street,
+                    City = doctorDTO.City,
+                    PostCode = doctorDTO.PostCode,
+                    AparmentNumber = doctorDTO.AparmentNumber
+                },
+                MedicalSpecializations = doctorDTO.MedicalSpecializations
             };
 
-            await _doctorRepository.InsertNewDoctorAsync(doctor);
+            await _doctorRepository.InsertDoctorAsync(doctor);
             OneOf<Doctor,DatabaseException> returnValue = await _doctorRepository.SaveChangesAsync();
 
             return returnValue.Match(
                 doctor => new Doctor(),
                 databaseExcption => returnValue);
+        }
+
+        public async Task<OneOf<Doctor, NotFound, DatabaseException>> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO)
+        {
+            var returnValue = await _doctorRepository.UpdateDoctorAsync(updateDoctorDTO);
+
+            returnValue.Match(
+                doctor => doctor,
+                notFound => new NotFound(),
+                databaseException => returnValue);
+
+            return returnValue;
         }
     }
 }

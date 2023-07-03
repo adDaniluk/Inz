@@ -2,7 +2,7 @@
 
 namespace Inz.Model
 {
-    public class Address : TimestampModel
+    public class Address
     {
         public int Id { get; set; }
         [MaxLength(100)]

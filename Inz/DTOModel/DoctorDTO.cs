@@ -1,4 +1,6 @@
-﻿namespace Inz.DTOModel
+﻿using Inz.Model;
+
+namespace Inz.DTOModel
 {
     public class DoctorDTO
     {
@@ -16,5 +18,6 @@
         public int AparmentNumber { get; set; }
         public int LicenseNumber { get; set; }
         public string? Biography { get; set; }
+        public ICollection<MedicalSpecialization> MedicalSpecializations { get; set; } = new List<MedicalSpecialization>();
     }
 }

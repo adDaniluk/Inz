@@ -22,6 +22,31 @@ namespace Inz.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("DoctorMedicalSpecialization", b =>
+                {
+                    b.Property<int>("DoctorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MedicalSpecializationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DoctorsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MedicalSpecializationsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("DoctorId", "MedicalSpecializationId");
+
+                    b.HasIndex("DoctorsId");
+
+                    b.HasIndex("MedicalSpecializationId");
+
+                    b.HasIndex("MedicalSpecializationsId");
+
+                    b.ToTable("DoctorMedicalSpecialization");
+                });
+
             modelBuilder.Entity("Inz.Model.Address", b =>
                 {
                     b.Property<int>("Id")
@@ -30,9 +55,6 @@ namespace Inz.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("AlterTimestamp")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("AparmentNumber")
                         .HasColumnType("int");
 
@@ -40,12 +62,6 @@ namespace Inz.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime?>("DeleteTimestamp")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("IsDeleted")
-                        .HasColumnType("int");
 
                     b.Property<string>("PostCode")
                         .IsRequired()
@@ -56,9 +72,6 @@ namespace Inz.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -243,21 +256,6 @@ namespace Inz.Migrations
                         .IsUnique();
 
                     b.ToTable("Doctors");
-                });
-
-            modelBuilder.Entity("Inz.Model.DoctorMedicalSpecialization", b =>
-                {
-                    b.Property<int>("DoctorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MedicalSpecializationId")
-                        .HasColumnType("int");
-
-                    b.HasKey("DoctorId", "MedicalSpecializationId");
-
-                    b.HasIndex("MedicalSpecializationId");
-
-                    b.ToTable("DoctorMedicalSpecializations");
                 });
 
             modelBuilder.Entity("Inz.Model.DoctorService", b =>
@@ -579,6 +577,33 @@ namespace Inz.Migrations
                     b.ToTable("TimeBlocks");
                 });
 
+            modelBuilder.Entity("DoctorMedicalSpecialization", b =>
+                {
+                    b.HasOne("Inz.Model.Doctor", null)
+                        .WithMany()
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Inz.Model.Doctor", null)
+                        .WithMany()
+                        .HasForeignKey("DoctorsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Inz.Model.MedicalSpecialization", null)
+                        .WithMany()
+                        .HasForeignKey("MedicalSpecializationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Inz.Model.MedicalSpecialization", null)
+                        .WithMany()
+                        .HasForeignKey("MedicalSpecializationsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Inz.Model.Calendar", b =>
                 {
                     b.HasOne("Inz.Model.Doctor", "Doctor")
@@ -665,25 +690,6 @@ namespace Inz.Migrations
                         .IsRequired();
 
                     b.Navigation("Address");
-                });
-
-            modelBuilder.Entity("Inz.Model.DoctorMedicalSpecialization", b =>
-                {
-                    b.HasOne("Inz.Model.Doctor", "Doctor")
-                        .WithMany("DoctorMedicalSpecializations")
-                        .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Inz.Model.MedicalSpecialization", "MedicalSpecialization")
-                        .WithMany("DoctorMedicalSpecializations")
-                        .HasForeignKey("MedicalSpecializationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Doctor");
-
-                    b.Navigation("MedicalSpecialization");
                 });
 
             modelBuilder.Entity("Inz.Model.DoctorService", b =>
@@ -799,8 +805,6 @@ namespace Inz.Migrations
 
                     b.Navigation("CuredDiseases");
 
-                    b.Navigation("DoctorMedicalSpecializations");
-
                     b.Navigation("DoctorServices");
                 });
 
@@ -811,11 +815,6 @@ namespace Inz.Migrations
                     b.Navigation("Receipt");
 
                     b.Navigation("Referrals");
-                });
-
-            modelBuilder.Entity("Inz.Model.MedicalSpecialization", b =>
-                {
-                    b.Navigation("DoctorMedicalSpecializations");
                 });
 
             modelBuilder.Entity("Inz.Model.Medicine", b =>
