@@ -1,5 +1,6 @@
 ﻿using Inz.Model;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.Design.Serialization;
 
 namespace Inz.Context
 {
@@ -19,7 +20,7 @@ namespace Inz.Context
         public DbSet<Status> Statuses { get; set; }
         public DbSet<TimeBlock> TimeBlocks { get; set; }
         public DbSet<CuredDisease> CuredDiseases { get; set; }
-        public DbSet<DoctorMedicalSpecialization> DoctorMedicalSpecializations { get; set; }
+        //public DbSet<DoctorMedicalSpecialization> DoctorMedicalSpecializations { get; set; }
         public DbSet<DoctorVisit> DoctorVisits { get; set; }
         public DbSet<MedicalSpecialization> MedicalSpecializations { get; set; }
         public DbSet<Medicine> Medicines { get; set; }
@@ -123,8 +124,17 @@ namespace Inz.Context
             modelBuilder.Entity<DiseaseSuspicion>()
                 .HasKey(ds => new { ds.DoctorVisitId, ds.DiseaseId });
 
-            modelBuilder.Entity<DoctorMedicalSpecialization>()
-                .HasKey(dms => new { dms.DoctorId, dms.MedicalSpecializationId });
+            modelBuilder.Entity<Doctor>()
+                .HasMany(d => d.MedicalSpecializations)
+                .WithMany(ms => ms.Doctors)
+                .UsingEntity(
+                "DoctorMedicalSpecialization",
+                d => d.HasOne(typeof(Doctor)).WithMany().HasForeignKey("DoctorId").HasPrincipalKey(nameof(Doctor.Id)),
+                ms => ms.HasOne(typeof(MedicalSpecialization)).WithMany().HasForeignKey("MedicalSpecializationId").HasPrincipalKey(nameof(MedicalSpecialization.Id)),
+                dms => dms.HasKey("DoctorId", "MedicalSpecializationId"));
+
+            //modelBuilder.Entity<DoctorMedicalSpecialization>()
+            //    .HasKey(dms => new { dms.DoctorId, dms.MedicalSpecializationId });
 
             modelBuilder.Entity<DoctorService>()
                 .HasKey(ds => new {ds.ServiceId , ds.DoctorId });

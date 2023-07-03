@@ -2,17 +2,17 @@
 {
     public class PatientDTO
     {
-        public string? Login { get; set; }
-        public string? Password { get; set; }
-        public string? UserId { get; set; }
-        public string? Email { get; set; }
+        public string Login { get; set; } = null!;
+        public string Password { get; set; } = null!;
+        public string UserId { get; set; } = null!;
+        public string Email { get; set; } = null!;
         public int Phone { get; set; }
-        public string? Name { get; set; }
-        public string? Surname { get; set; }
+        public string Name { get; set; } = null!;
+        public string Surname { get; set; } = null!;
         public DateTime DateOfBirth { get; set; }
-        public string? Street { get; set; }
-        public string? City { get; set; }
-        public string? PostCode { get; set; }
+        public string Street { get; set; } = null!;
+        public string City { get; set; } = null!;
+        public string PostCode { get; set; } = null!;
         public int AparmentNumber { get; set; }
     }
 }

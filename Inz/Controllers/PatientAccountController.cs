@@ -1,4 +1,5 @@
-﻿using Inz.DTOModel;
+﻿using FluentValidation;
+using Inz.DTOModel;
 using Inz.DTOModel.Validators;
 using Inz.OneOfHelper;
 using Inz.Services;
@@ -41,9 +42,8 @@ namespace Inz.Controllers
 
         [Route("api/[controller]/{id}")]
         [HttpPut]
-        public async Task<IActionResult> UpdatePatientAsync(UpdatePatientDTO updatePatientDTO, int id)
+        public async Task<IActionResult> UpdatePatientAsync(UpdatePatientDTO updatePatientDTO)
         {
-            updatePatientDTO.Id = id;
 
             UpdatePatientDTOValidator updatePatientDTOValidator = new UpdatePatientDTOValidator();
             var validatorResult = updatePatientDTOValidator.Validate(updatePatientDTO);
@@ -57,7 +57,7 @@ namespace Inz.Controllers
 
             IActionResult actionResult = returnValue.Match(
                 patient => Ok("User has been updated."),
-                notFound => NotFound($"User with {id} does not exist."),
+                notFound => NotFound($"User with {updatePatientDTO.Id} does not exist."),
                 databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
                     $"See inner exception: {databaseException.exception.Message}"));
 

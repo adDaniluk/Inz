@@ -2,7 +2,7 @@
 
 namespace Inz.DTOModel.Validators
 {
-    public class PatientDTOValidator : AbstractValidator<DoctorDTO>
+    public class PatientDTOValidator : AbstractValidator<PatientDTO>
     {
         public PatientDTOValidator()
         {
@@ -19,8 +19,6 @@ namespace Inz.DTOModel.Validators
             RuleFor(p => p.Street).NotNull().NotEmpty().Length(3, 200);
             RuleFor(p => p.AparmentNumber).NotEmpty().NotNull();
             RuleFor(p => p.PostCode).NotNull().NotEmpty().Length(6);
-            RuleFor(p => p.LicenseNumber).NotNull().NotEmpty();
-            RuleFor(p => p.Biography).NotNull();
         }
     }
 }

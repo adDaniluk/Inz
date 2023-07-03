@@ -7,6 +7,6 @@ namespace Inz.Controllers
     {
         public Task<IActionResult> InsertPatientAsync(PatientDTO patientDTO);
 
-        public Task<IActionResult> UpdatePatientAsync(UpdatePatientDTO updatePatientDTO, int id);
+        public Task<IActionResult> UpdatePatientAsync(UpdatePatientDTO updatePatientDTO);
     }
 }
