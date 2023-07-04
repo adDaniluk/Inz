@@ -61,10 +61,6 @@ namespace Inz.Controllers
                     $"See inner exception: {databaseException.exception.Message}"));
 
             return actionResult;
-
-
-
-            return Ok();
         }
     }
 }

@@ -23,6 +23,7 @@ namespace Inz.Services
             {
                 Login = doctorDTO.Login,
                 Password = doctorDTO.Password,
+                UserId = doctorDTO.UserId,
                 Email = doctorDTO.Email,
                 Phone = doctorDTO.Phone,
                 Name = doctorDTO.Name,
@@ -37,7 +38,8 @@ namespace Inz.Services
                     PostCode = doctorDTO.PostCode,
                     AparmentNumber = doctorDTO.AparmentNumber
                 },
-                MedicalSpecializations = doctorDTO.MedicalSpecializations
+                //TODO MedicalSpecializations map
+                //MedicalSpecializations = doctorDTO.MedicalSpecializations
             };
 
             await _doctorRepository.InsertDoctorAsync(doctor);

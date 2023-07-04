@@ -127,11 +127,12 @@ namespace Inz.Context
             modelBuilder.Entity<Doctor>()
                 .HasMany(d => d.MedicalSpecializations)
                 .WithMany(ms => ms.Doctors)
-                .UsingEntity(
-                "DoctorMedicalSpecialization",
-                d => d.HasOne(typeof(Doctor)).WithMany().HasForeignKey("DoctorId").HasPrincipalKey(nameof(Doctor.Id)),
-                ms => ms.HasOne(typeof(MedicalSpecialization)).WithMany().HasForeignKey("MedicalSpecializationId").HasPrincipalKey(nameof(MedicalSpecialization.Id)),
-                dms => dms.HasKey("DoctorId", "MedicalSpecializationId"));
+                .UsingEntity("DoctorMedicalSpecialization");
+                //.UsingEntity(
+                //"DoctorMedicalSpecialization",
+                //d => d.HasOne(typeof(Doctor)).WithMany().HasForeignKey("DoctorId").HasPrincipalKey(nameof(Doctor.Id)),
+                //ms => ms.HasOne(typeof(MedicalSpecialization)).WithMany().HasForeignKey("MedicalSpecializationId").HasPrincipalKey(nameof(MedicalSpecialization.Id)),
+                //dms => dms.HasKey("DoctorId", "MedicalSpecializationId"));
 
             //modelBuilder.Entity<DoctorMedicalSpecialization>()
             //    .HasKey(dms => new { dms.DoctorId, dms.MedicalSpecializationId });

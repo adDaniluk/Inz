@@ -18,6 +18,6 @@ namespace Inz.DTOModel
         public int AparmentNumber { get; set; }
         public int LicenseNumber { get; set; }
         public string? Biography { get; set; }
-        public ICollection<MedicalSpecialization> MedicalSpecializations { get; set; } = new List<MedicalSpecialization>();
+        public ICollection<int>? MedicalSpecializationId { get; set; }
     }
 }

@@ -24,23 +24,13 @@ namespace Inz.Migrations
 
             modelBuilder.Entity("DoctorMedicalSpecialization", b =>
                 {
-                    b.Property<int>("DoctorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MedicalSpecializationId")
-                        .HasColumnType("int");
-
                     b.Property<int>("DoctorsId")
                         .HasColumnType("int");
 
                     b.Property<int>("MedicalSpecializationsId")
                         .HasColumnType("int");
 
-                    b.HasKey("DoctorId", "MedicalSpecializationId");
-
-                    b.HasIndex("DoctorsId");
-
-                    b.HasIndex("MedicalSpecializationId");
+                    b.HasKey("DoctorsId", "MedicalSpecializationsId");
 
                     b.HasIndex("MedicalSpecializationsId");
 
@@ -581,19 +571,7 @@ namespace Inz.Migrations
                 {
                     b.HasOne("Inz.Model.Doctor", null)
                         .WithMany()
-                        .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Inz.Model.Doctor", null)
-                        .WithMany()
                         .HasForeignKey("DoctorsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Inz.Model.MedicalSpecialization", null)
-                        .WithMany()
-                        .HasForeignKey("MedicalSpecializationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

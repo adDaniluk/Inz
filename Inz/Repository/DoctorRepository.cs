@@ -41,11 +41,17 @@ namespace Inz.Repository
             try
             {
                 var doctorToUpdate = await _dbContextApi.Doctors.Include(x => x.Address).Include(x => x.MedicalSpecializations)
-                    .SingleOrDefaultAsync(x => x.Id == updateDoctorDTO.Id && x.MedicalSpecializations == updateDoctorDTO.MedicalSpecializations);
+                    .SingleOrDefaultAsync(x => x.Id == updateDoctorDTO.Id);
 
                 if (doctorToUpdate == null)
                 {
                     return new NotFound();
+                }
+
+                if (updateDoctorDTO.MedicalSpecializationId != null)
+                {
+                    var medicalSpecializationsToUpdate = await _dbContextApi.MedicalSpecializations.Where(x => updateDoctorDTO.MedicalSpecializationId.Contains(x.Id)).ToListAsync();
+                    doctorToUpdate.MedicalSpecializations = medicalSpecializationsToUpdate;
                 }
 
                 doctorToUpdate.Email = updateDoctorDTO.Email;
@@ -56,13 +62,10 @@ namespace Inz.Repository
                 doctorToUpdate.Address.AparmentNumber = updateDoctorDTO.AparmentNumber;
                 doctorToUpdate.AlterTimestamp = DateTime.Now;
                 doctorToUpdate.Biography = updateDoctorDTO.Biography;
-                doctorToUpdate.MedicalSpecializations = updateDoctorDTO.MedicalSpecializations;
-                
 
                 await _dbContextApi.SaveChangesAsync();
 
                 return doctorToUpdate;
-
 
             }catch(Exception e)
             {
