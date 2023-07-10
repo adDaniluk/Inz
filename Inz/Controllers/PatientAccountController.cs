@@ -24,7 +24,7 @@ namespace Inz.Controllers
 
             if(!validatorResult.IsValid)
             {
-                return BadRequest(validatorResult.Errors.ToList().Select(x => x.ErrorMessage));
+                return BadRequest(validatorResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" }));
             }
 
             var returnValue = await _patientService.InsertPatientAsync(patientDTO);
@@ -37,7 +37,7 @@ namespace Inz.Controllers
             return actionResult;
         }
 
-        [Route("api/[controller]/update")]
+        [Route("api/[controller]/Update")]
         [HttpPut]
         public async Task<IActionResult> UpdatePatientAsync(UpdatePatientDTO updatePatientDTO)
         {
@@ -47,7 +47,7 @@ namespace Inz.Controllers
 
             if (!validatorResult.IsValid)
             {
-                return BadRequest(validatorResult.Errors.ToList().Select(x => x.ErrorMessage));
+                return BadRequest(validatorResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" }));
             }
 
             var returnValue = await _patientService.UpdatePatientAsyc(updatePatientDTO);

@@ -8,7 +8,7 @@ using OneOf;
 
 namespace Inz.Controllers
 {
-    [Route("api/[controller]/Doctor")]
+    [Route("api/[controller]")]
     [ApiController]
     public class DoctorAccountController : ControllerBase, IDoctorAccountController
     {
@@ -27,7 +27,7 @@ namespace Inz.Controllers
 
             if (!validatorResult.IsValid)
             {
-                return BadRequest(validatorResult.Errors.ToList().Select(x => new { x.ErrorMessage, x.ErrorCode }));;
+                return BadRequest(validatorResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}"}));
             }
 
             OneOf<Doctor, DatabaseException> returnValue = await _doctorService.InsertDoctorAsync(doctorDTO);
@@ -40,7 +40,7 @@ namespace Inz.Controllers
             return actionResult;
         }
 
-        [Route("api/[controller]/DoctorUpdate")]
+        [Route("api/[controller]/Update")]
         [HttpPut]
         public async Task<IActionResult> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO)
         {
@@ -49,7 +49,7 @@ namespace Inz.Controllers
 
             if(!validatorResult.IsValid)
             {
-                return BadRequest(validatorResult.Errors.ToList().Select(x => x.ErrorMessage));
+                return BadRequest(validatorResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" }));
             }
 
             var returnValue = await _doctorService.UpdateDoctorAsync(updateDoctorDTO);
