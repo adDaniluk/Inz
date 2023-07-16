@@ -11,10 +11,12 @@ namespace Inz.Repository
     public class DoctorRepository : IDoctorRepository
     {
         private readonly DbContextApi _dbContextApi;
+        private readonly ILogger _logger;
 
-        public DoctorRepository(DbContextApi dbContextApi)
+        public DoctorRepository(DbContextApi dbContextApi, ILogger<IDoctorRepository> logger)
         {
             _dbContextApi = dbContextApi;
+            _logger = logger;
         }
 
         public async Task InsertDoctorAsync(Doctor doctor)
@@ -30,6 +32,7 @@ namespace Inz.Repository
             }
             catch(Exception exception)
             {
+                _logger.LogError(message: exception.Message);
                 return new DatabaseException(exception);
             }
 
@@ -45,6 +48,7 @@ namespace Inz.Repository
 
                 if (doctorToUpdate == null)
                 {
+                    _logger.LogError(message: $"Doctor with Id:{updateDoctorDTO.Id} does not exist");
                     return new NotFound();
                 }
 
@@ -67,9 +71,49 @@ namespace Inz.Repository
 
                 return doctorToUpdate;
 
-            }catch(Exception e)
+            }catch(Exception exception)
             {
-                return new DatabaseException(e);
+                _logger.LogError(message: $"Error: {exception}");
+                return new DatabaseException(exception);
+            }
+        }
+        public async Task<OneOf<DoctorServices, NotFound, DatabaseException>> AddDoctorServiceAsync(ServiceDoctorDTO serviceDTO)
+        {
+            try
+            {
+                bool doesServiceExist = await _dbContextApi.Services.AnyAsync(x => x.Id == serviceDTO.ServiceId);
+                bool doesDoctorExist = await _dbContextApi.Doctors.AnyAsync(x => x.Id == serviceDTO.DoctorId);
+
+                if (doesDoctorExist && doesServiceExist)
+                {
+                    DoctorServices doctorService = new DoctorServices()
+                    {
+                        DoctorId = serviceDTO.DoctorId,
+                        ServiceId = serviceDTO.ServiceId,
+                        Price = serviceDTO.Price
+                    };
+
+                    await _dbContextApi.DoctorServices.AddAsync(doctorService);
+                    await _dbContextApi.SaveChangesAsync();
+                }
+                
+                if (!doesServiceExist)
+                {
+                    _logger.LogError(message: $"Service with Id: {serviceDTO.ServiceId} does not exist");
+                    return new NotFound();
+                }
+                else if (!doesDoctorExist)
+                {
+                    _logger.LogError(message: $"Doctor with Id: {serviceDTO.DoctorId} does not exist");
+                    return new NotFound();
+                }
+
+                return new DoctorServices();
+
+            }catch(Exception execption)
+            {
+                _logger.LogError(message: $"{execption.Message}");
+                return new DatabaseException(execption);
             }
         }
     }

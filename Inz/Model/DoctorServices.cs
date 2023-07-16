@@ -1,6 +1,6 @@
 ﻿namespace Inz.Model
 {
-    public class DoctorService
+    public class DoctorServices
     {
         public int DoctorId { get; set; }
         public int ServiceId { get; set; }

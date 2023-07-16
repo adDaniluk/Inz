@@ -15,7 +15,6 @@ namespace Inz.Services
         {
             _doctorRepository = doctorRepository;
         }
-
         public async Task<OneOf<Doctor, DatabaseException>> InsertDoctorAsync(DoctorDTO doctorDTO)
         {
 
@@ -54,12 +53,20 @@ namespace Inz.Services
         {
             var returnValue = await _doctorRepository.UpdateDoctorAsync(updateDoctorDTO);
 
-            returnValue.Match(
+            return returnValue.Match(
                 doctor => doctor,
                 notFound => new NotFound(),
                 databaseException => returnValue);
+        }
 
-            return returnValue;
+        public async Task<OneOf<DoctorServices, NotFound, DatabaseException>> AddDoctorServiceAsync(ServiceDoctorDTO serviceDTO)
+        {
+            var returnValue = await _doctorRepository.AddDoctorServiceAsync(serviceDTO);
+
+            return returnValue.Match(
+                doctorServces => doctorServces,
+                notFound => new NotFound(),
+                databaseException => returnValue);
         }
     }
 }

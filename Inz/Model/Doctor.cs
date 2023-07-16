@@ -13,7 +13,7 @@ namespace Inz.Model
         public Address Address { get; set; } = null!;
         public virtual ICollection<Calendar>? Calendars { get; set; }
         public virtual ICollection<MedicalSpecialization>? MedicalSpecializations { get; set; }
-        public virtual ICollection<DoctorService>? DoctorServices { get; set; }
+        public virtual ICollection<DoctorServices>? DoctorServices { get; set; }
         public virtual ICollection<CuredDisease>? CuredDiseases { get; set; } 
     }
 }

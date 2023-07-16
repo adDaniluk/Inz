@@ -3,7 +3,7 @@
     public class CalendarDTO
     {
         public int DoctorId { get; set; }
-        public int Status { get; set; }
-
+        public ICollection<int> TimeBlockIds { get; set; } = null!;
+        public DateTime Date { get; set; }
     }
 }

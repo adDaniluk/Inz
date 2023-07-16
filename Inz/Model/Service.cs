@@ -10,6 +10,6 @@ namespace Inz.Model
         [MaxLength(200)]
         public string Name { get; set; } = null!;
         public virtual ICollection<Calendar> Calendars { get; set; } = new List<Calendar>();
-        public virtual ICollection<DoctorService> DoctorServices { get; set; } = new List<DoctorService>();
+        public virtual ICollection<DoctorServices> DoctorServices { get; set; } = new List<DoctorServices>();
     }
 }

@@ -2,6 +2,7 @@ using Inz.Context;
 using Inz.Repository;
 using Inz.Services;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,12 @@ builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 
 builder.Services.AddScoped<IDoctorService, DoctorService>();
 builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
+
+builder.Services.AddScoped<ICalendarService, CalendarService>();
+builder.Services.AddScoped<ICalendarRepository, CalendarRepository>();
+
+builder.Host.UseSerilog((ctx, lc)
+    => lc.ReadFrom.Configuration(ctx.Configuration));
 
 var app = builder.Build();
 

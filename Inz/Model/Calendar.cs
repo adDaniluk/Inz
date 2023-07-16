@@ -9,7 +9,6 @@
         public int? PatientId { get; set; }
         public int TimeBlockId { get; set; }
         public int? ServiceId { get; set; }
-        public int DoctorVisitId { get; set; }
         public DoctorVisit? DoctorVisit { get; set; }
         public Doctor Doctor { get; set; } = null!;
         public Patient? Patient { get; set; }

@@ -12,5 +12,6 @@ namespace Inz.Repository
         public Task InsertDoctorAsync(Doctor doctor);
         public Task<OneOf<Doctor, DatabaseException>> SaveChangesAsync();
         public Task<OneOf<Doctor, NotFound, DatabaseException>> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO);
+        public Task<OneOf<DoctorServices, NotFound, DatabaseException>> AddDoctorServiceAsync(ServiceDoctorDTO serviceDTO);
     }
 }

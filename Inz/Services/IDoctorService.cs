@@ -9,7 +9,7 @@ namespace Inz.Services
     public interface IDoctorService
     {
         public Task<OneOf<Doctor, DatabaseException>> InsertDoctorAsync(DoctorDTO doctorDTO);
-
         public Task<OneOf<Doctor, NotFound, DatabaseException>> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO);
+        public Task<OneOf<DoctorServices, NotFound, DatabaseException>> AddDoctorServiceAsync(ServiceDoctorDTO serviceDTO);
     }
 }

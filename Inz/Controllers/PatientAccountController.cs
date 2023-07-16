@@ -10,12 +10,15 @@ namespace Inz.Controllers
     public class PatientAccountController : ControllerBase, IPatientAccountController
     {
         private readonly IPatientService _patientService;
+        private readonly ILogger _logger;
 
-        public PatientAccountController(IPatientService patientService)
+        public PatientAccountController(IPatientService patientService, ILogger<PatientAccountController> logger)
         {
             _patientService = patientService;
+            _logger = logger;
         }
 
+        [Route("AddPatient")]
         [HttpPost]
         public async Task<IActionResult> InsertPatientAsync(PatientDTO patientDTO)
         {
@@ -37,7 +40,7 @@ namespace Inz.Controllers
             return actionResult;
         }
 
-        [Route("api/[controller]/Update")]
+        [Route("Update")]
         [HttpPut]
         public async Task<IActionResult> UpdatePatientAsync(UpdatePatientDTO updatePatientDTO)
         {
