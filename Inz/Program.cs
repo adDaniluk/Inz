@@ -14,7 +14,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<DbContextApi>(option => option.UseSqlServer(
-    builder.Configuration.GetSection("ConnectionDbStrings")["localhostExpress"]));
+    builder.Configuration.GetSection("ConnectionDbStrings")["localhostExpress2"]));
 
 builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();

@@ -33,9 +33,9 @@ namespace Inz.Controllers
             var returnValue = await _patientService.InsertPatientAsync(patientDTO);
 
             IActionResult actionResult = returnValue.Match(
-                patient => Ok("New user has been created."),
+                patient => Ok(patient.Response),
                 databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
-                    $"See inner exception: {databaseException.exception.Message}"));
+                    $"See inner exception: {databaseException.Exception.Message}"));
 
             return actionResult;
         }
@@ -56,10 +56,10 @@ namespace Inz.Controllers
             var returnValue = await _patientService.UpdatePatientAsyc(updatePatientDTO);
 
             IActionResult actionResult = returnValue.Match(
-                patient => Ok("User has been updated."),
-                notFound => NotFound($"User with {updatePatientDTO.Id} does not exist."),
+                patient => Ok(patient.Response),
+                notFound => NotFound(notFound.Response),
                 databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
-                    $"See inner exception: {databaseException.exception.Message}"));
+                    $"See inner exception: {databaseException.Exception.Message}"));
 
             return actionResult;
         }

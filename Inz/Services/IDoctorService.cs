@@ -1,15 +1,14 @@
 ﻿using Inz.DTOModel;
-using Inz.Model;
 using Inz.OneOfHelper;
 using OneOf;
-using OneOf.Types;
 
 namespace Inz.Services
 {
     public interface IDoctorService
     {
-        public Task<OneOf<Doctor, DatabaseException>> InsertDoctorAsync(DoctorDTO doctorDTO);
-        public Task<OneOf<Doctor, NotFound, DatabaseException>> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO);
-        public Task<OneOf<DoctorServices, NotFound, DatabaseException>> AddDoctorServiceAsync(ServiceDoctorDTO serviceDTO);
+        public Task<OneOf<OkResponse, DatabaseExceptionResponse>> InsertDoctorAsync(DoctorDTO doctorDTO);
+        public Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO);
+        public Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> AddDoctorServiceAsync(ServiceDoctorDTO serviceDTO);
+        public Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> RemoveDoctorServiceAsync(ServiceDoctorDTO serviceDTO);
     }
 }

@@ -4,17 +4,19 @@ using Inz.Model;
 using Inz.OneOfHelper;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
-using OneOf.Types;
 
 namespace Inz.Repository
 {
     public class PatientRepository : IPatientRepository
     {
         private readonly DbContextApi _dbContextApi;
+        private readonly ILogger _logger;
 
-        public PatientRepository(DbContextApi dbContext)
+        public PatientRepository(DbContextApi dbContext, ILogger<IPatientRepository> logger)
         {
             _dbContextApi = dbContext;
+            _logger = logger;
+
         }
 
         public async Task InsertPatientAsync(Patient patient)
@@ -22,28 +24,35 @@ namespace Inz.Repository
             await _dbContextApi.Patients.AddAsync(patient);
         }
 
-        public async Task<OneOf<Patient, DatabaseException>> SaveChangesAsync()
+        public async Task<OneOf<OkResponse, DatabaseExceptionResponse>> SaveChangesAsync()
         {
             try
             {
                 await _dbContextApi.SaveChangesAsync();
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-                return new DatabaseException(e);
+                _logger.LogError(message: exception.Message);
+                return new DatabaseExceptionResponse(exception);
             }
-            return new Patient();
+
+            string log = "Patient has been created.";
+            _logger.LogInformation(message: log);
+            return new OkResponse(log);
         }
 
-        public async Task<OneOf<Patient, NotFound, DatabaseException>> UpdatePatientAsyc(UpdatePatientDTO updatePatientDTO)
+        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> UpdatePatientAsyc(UpdatePatientDTO updatePatientDTO)
         {
             try
             {
+                string log;
                 var patientToUpdate = await _dbContextApi.Patients.Include(x => x.Address).SingleOrDefaultAsync(x => x.Id == updatePatientDTO.Id);
 
                 if (patientToUpdate == null)
                 {
-                    return new NotFound();
+                    log = $"Patient with id: {updatePatientDTO.Id} does not exist.";
+                    _logger.LogInformation(message: log);
+                    return new NotFoundResponse(log);
                 }
 
                 patientToUpdate.Email = updatePatientDTO.Email;
@@ -56,11 +65,14 @@ namespace Inz.Repository
                 
                 await _dbContextApi.SaveChangesAsync();
 
-                return patientToUpdate;
+                log = "Patient has been updated with success.";
+                _logger.LogInformation(message: log);
+                return new OkResponse(log);
 
             }catch(Exception exception)
             {
-                return new DatabaseException(exception);
+                _logger.LogError(message: exception.Message);
+                return new DatabaseExceptionResponse(exception);
             }
         }
     }

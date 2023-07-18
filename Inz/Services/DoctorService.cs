@@ -3,7 +3,6 @@ using Inz.Model;
 using Inz.OneOfHelper;
 using Inz.Repository;
 using OneOf;
-using OneOf.Types;
 
 namespace Inz.Services
 {
@@ -15,7 +14,7 @@ namespace Inz.Services
         {
             _doctorRepository = doctorRepository;
         }
-        public async Task<OneOf<Doctor, DatabaseException>> InsertDoctorAsync(DoctorDTO doctorDTO)
+        public async Task<OneOf<OkResponse, DatabaseExceptionResponse>> InsertDoctorAsync(DoctorDTO doctorDTO)
         {
 
             Doctor doctor = new Doctor()
@@ -42,30 +41,40 @@ namespace Inz.Services
             };
 
             await _doctorRepository.InsertDoctorAsync(doctor);
-            OneOf<Doctor,DatabaseException> returnValue = await _doctorRepository.SaveChangesAsync();
+            OneOf<OkResponse,DatabaseExceptionResponse> returnValue = await _doctorRepository.SaveChangesAsync();
 
             return returnValue.Match(
-                doctor => new Doctor(),
+                okResponse => okResponse,
                 databaseExcption => returnValue);
         }
 
-        public async Task<OneOf<Doctor, NotFound, DatabaseException>> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO)
+        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO)
         {
             var returnValue = await _doctorRepository.UpdateDoctorAsync(updateDoctorDTO);
 
             return returnValue.Match(
-                doctor => doctor,
-                notFound => new NotFound(),
+                okResponse => okResponse,
+                notFound => notFound,
                 databaseException => returnValue);
         }
 
-        public async Task<OneOf<DoctorServices, NotFound, DatabaseException>> AddDoctorServiceAsync(ServiceDoctorDTO serviceDTO)
+        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> AddDoctorServiceAsync(ServiceDoctorDTO serviceDTO)
         {
             var returnValue = await _doctorRepository.AddDoctorServiceAsync(serviceDTO);
 
             return returnValue.Match(
-                doctorServces => doctorServces,
-                notFound => new NotFound(),
+                okResponse => okResponse,
+                notFound => notFound,
+                databaseException => returnValue);
+        }
+
+        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> RemoveDoctorServiceAsync(ServiceDoctorDTO serviceDTO)
+        {
+            var returnValue = await _doctorRepository.RemoveDoctorServiceAsync(serviceDTO);
+
+            return returnValue.Match(
+                okResponse => okResponse,
+                notFound => notFound,
                 databaseException => returnValue);
         }
     }

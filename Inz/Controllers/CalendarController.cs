@@ -31,10 +31,10 @@ namespace Inz.Controllers
             var returnValue = await _calendarService.CreateCalendarAsync(calendarDTO);
 
             var actionResult = returnValue.Match(
-                calendar => Ok("New calendars have been added."),
-                notFound => BadRequest($"Ids are not correct, see inner logs."),
+                calendar => Ok(calendar.Response),
+                notFound => BadRequest(notFound.Response),
                 databaseException => Problem($"Cannot connect to the database, please contact Admin@admin.admin | " +
-                    $"See inner exception: {databaseException.exception.Message}"));
+                    $"See inner exception: {databaseException.Exception.Message}"));
 
             return actionResult;
         }

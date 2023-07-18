@@ -4,12 +4,12 @@ using Inz.Model;
 using Inz.OneOfHelper;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
-using OneOf.Types;
 
 namespace Inz.Repository
 {
     public class CalendarRepository : ICalendarRepository
     {
+
         private readonly DbContextApi _dbContextApi;
         private readonly ILogger _logger;
 
@@ -19,10 +19,12 @@ namespace Inz.Repository
             _logger = logger;
 
         }
-        public async Task<OneOf<Calendar, NotFound, DatabaseException>> ValidAndCreateCalendarAsync(CalendarDTO calendarDTO)
+        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> ValidAndCreateCalendarAsync(CalendarDTO calendarDTO)
         {
             try
             {
+                string log;
+
                 bool doesDoctorExist = await _dbContextApi.Doctors.AnyAsync(x => x.Id == calendarDTO.DoctorId);
 
                 bool doesDoctorHaveCalendarAlready = await _dbContextApi.Calendars
@@ -32,12 +34,12 @@ namespace Inz.Repository
 
                 if (!doesDoctorExist || doesDoctorHaveCalendarAlready)
                 {
-                    if (!doesDoctorExist)
-                        _logger.LogError(message: $"Doctor with Id:{calendarDTO.DoctorId} does not exist.");
-                    else
-                        _logger.LogError(message: $"Doctor has already created calendar blocks.");
+                    log = !doesDoctorExist ?
+                        $"Doctor with Id:{calendarDTO.DoctorId} does not exist." :
+                        $"Calendar cannot be created for the same date/block.";
 
-                    return new NotFound();
+                    _logger.LogInformation(message: log);
+                    return new NotFoundResponse(log);
                 }
 
                 List<Calendar> calendars = CastCalendarDTOIntoCalendar(calendarDTO);
@@ -46,16 +48,17 @@ namespace Inz.Repository
 
                 await _dbContextApi.SaveChangesAsync();
 
-                return new Calendar();
+                log = "New calendar(s) have been added";
+                _logger.LogInformation(message: log);
+                return new OkResponse(log);
 
             }
             catch (Exception exception) {
                 _logger.LogError(message: $"{exception.Message}");
-                return new DatabaseException(exception);
+                return new DatabaseExceptionResponse(exception);
             }
         }
-
-        private List<Calendar> CastCalendarDTOIntoCalendar(CalendarDTO calendarDTO)
+        private static List<Calendar> CastCalendarDTOIntoCalendar(CalendarDTO calendarDTO)
         {
             List<Calendar> calendars = calendarDTO.TimeBlockIds.Select(id => new Calendar
             {

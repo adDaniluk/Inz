@@ -2,10 +2,7 @@
 using Inz.Model;
 using Inz.OneOfHelper;
 using Inz.Repository;
-using Microsoft.EntityFrameworkCore.Metadata;
 using OneOf;
-using OneOf.Types;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Inz.Services
 {
@@ -18,7 +15,7 @@ namespace Inz.Services
             _patientRepository = patientRepository;
         }
 
-        public async Task<OneOf<Patient, DatabaseException>> InsertPatientAsync(PatientDTO patientDTO)
+        public async Task<OneOf<OkResponse, DatabaseExceptionResponse>> InsertPatientAsync(PatientDTO patientDTO)
         {
 
             Patient patient = new Patient()
@@ -43,23 +40,21 @@ namespace Inz.Services
         };
 
             await _patientRepository.InsertPatientAsync(patient);
-            OneOf<Patient, DatabaseException> returnValue = await _patientRepository.SaveChangesAsync();
+            OneOf<OkResponse, DatabaseExceptionResponse> returnValue = await _patientRepository.SaveChangesAsync();
 
             return returnValue.Match(
-                patinet => new Patient(),
+                okResponse => okResponse,
                 databaseException => returnValue);
         }
 
-        public async Task<OneOf<Patient, NotFound, DatabaseException>> UpdatePatientAsyc(UpdatePatientDTO updatePatientDTO)
+        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> UpdatePatientAsyc(UpdatePatientDTO updatePatientDTO)
         {
             var returnValue = await _patientRepository.UpdatePatientAsyc(updatePatientDTO);
 
-            returnValue.Match(
-                patient => patient,
-                notFound => new NotFound(),
+            return returnValue.Match(
+                okResponse => okResponse,
+                notFound => notFound,
                 databaseException => returnValue);
-
-            return returnValue;
         }
     }
 }

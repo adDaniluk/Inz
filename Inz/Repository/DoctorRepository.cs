@@ -4,7 +4,6 @@ using Inz.Model;
 using Inz.OneOfHelper;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
-using OneOf.Types;
 
 namespace Inz.Repository
 {
@@ -24,7 +23,7 @@ namespace Inz.Repository
             await _dbContextApi.AddAsync(doctor);
         }
 
-        public async Task<OneOf<Doctor, DatabaseException>> SaveChangesAsync()
+        public async Task<OneOf<OkResponse, DatabaseExceptionResponse>> SaveChangesAsync()
         {
             try
             {
@@ -33,23 +32,26 @@ namespace Inz.Repository
             catch(Exception exception)
             {
                 _logger.LogError(message: exception.Message);
-                return new DatabaseException(exception);
+                return new DatabaseExceptionResponse(exception);
             }
-
-            return new Doctor();
+            string log = "Doctor has been created";
+            _logger.LogInformation(message: log);
+            return new OkResponse(log);
         }
 
-        public async Task<OneOf<Doctor, NotFound, DatabaseException>> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO)
+        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO)
         {
             try
             {
+                string log;
                 var doctorToUpdate = await _dbContextApi.Doctors.Include(x => x.Address).Include(x => x.MedicalSpecializations)
                     .SingleOrDefaultAsync(x => x.Id == updateDoctorDTO.Id);
 
                 if (doctorToUpdate == null)
                 {
-                    _logger.LogError(message: $"Doctor with Id:{updateDoctorDTO.Id} does not exist");
-                    return new NotFound();
+                    log = $"Doctor with Id:{updateDoctorDTO.Id} does not exist";
+                    _logger.LogError(message: log);
+                    return new NotFoundResponse(log);
                 }
 
                 if (updateDoctorDTO.MedicalSpecializationId != null)
@@ -69,18 +71,21 @@ namespace Inz.Repository
 
                 await _dbContextApi.SaveChangesAsync();
 
-                return doctorToUpdate;
+                log = $"Doctor has been updated";
+                _logger.LogInformation(message: log);
+                return new OkResponse(log);
 
             }catch(Exception exception)
             {
                 _logger.LogError(message: $"Error: {exception}");
-                return new DatabaseException(exception);
+                return new DatabaseExceptionResponse(exception);
             }
         }
-        public async Task<OneOf<DoctorServices, NotFound, DatabaseException>> AddDoctorServiceAsync(ServiceDoctorDTO serviceDTO)
+        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> AddDoctorServiceAsync(ServiceDoctorDTO serviceDTO)
         {
             try
             {
+                string log;
                 bool doesServiceExist = await _dbContextApi.Services.AnyAsync(x => x.Id == serviceDTO.ServiceId);
                 bool doesDoctorExist = await _dbContextApi.Doctors.AnyAsync(x => x.Id == serviceDTO.DoctorId);
 
@@ -97,23 +102,70 @@ namespace Inz.Repository
                     await _dbContextApi.SaveChangesAsync();
                 }
                 
-                if (!doesServiceExist)
+                if (!doesServiceExist || !doesDoctorExist)
                 {
-                    _logger.LogError(message: $"Service with Id: {serviceDTO.ServiceId} does not exist");
-                    return new NotFound();
-                }
-                else if (!doesDoctorExist)
-                {
-                    _logger.LogError(message: $"Doctor with Id: {serviceDTO.DoctorId} does not exist");
-                    return new NotFound();
+
+                    log = !doesServiceExist ?
+                        $"Service with Id: {serviceDTO.ServiceId} does not exist" :
+                        $"Doctor with Id: {serviceDTO.DoctorId} does not exist";
+                    
+                    _logger.LogError(message: log);
+                    return new NotFoundResponse(log);
                 }
 
-                return new DoctorServices();
-
-            }catch(Exception execption)
+                log = "Service has been added with success";
+                _logger.LogInformation(message: log);
+                return new OkResponse(log);
+            }
+            catch(Exception execption)
             {
                 _logger.LogError(message: $"{execption.Message}");
-                return new DatabaseException(execption);
+                return new DatabaseExceptionResponse(execption);
+            }
+        }
+
+        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> RemoveDoctorServiceAsync(ServiceDoctorDTO serviceDTO)
+        {
+            string log;
+            try
+            {
+                bool doesServiceExist = await _dbContextApi.Services.AnyAsync(x => x.Id == serviceDTO.ServiceId);
+                bool doesDoctorExist = await _dbContextApi.Doctors.AnyAsync(x => x.Id == serviceDTO.DoctorId);
+
+                if (doesDoctorExist && doesServiceExist)
+                {
+                    bool doesServiceExistInCalendar = await _dbContextApi.Calendars.AnyAsync(x => x.ServiceId == serviceDTO.ServiceId && x.DoctorId == serviceDTO.DoctorId);
+
+                    if (!doesServiceExistInCalendar)
+                    {
+                        var serviceDoctorToRemove = await _dbContextApi.DoctorServices.FirstAsync(x => x.ServiceId == serviceDTO.ServiceId && x.DoctorId == serviceDTO.DoctorId);
+                        _dbContextApi.DoctorServices.Remove(serviceDoctorToRemove);
+                        await _dbContextApi.SaveChangesAsync();
+                    }
+                    log = $"Service cannot be removed - it is used in doctor visit.";
+                    _logger.LogInformation(message: log);
+                    return new OkResponse(log);
+                }
+
+                if (!doesServiceExist || !doesDoctorExist)
+                {
+                    log = !doesServiceExist ?
+                    $"Service with Id: {serviceDTO.ServiceId} does not exist" :
+                    $"Doctor with Id: {serviceDTO.DoctorId} does not exist";
+
+                    _logger.LogError(message: log);
+                    return new NotFoundResponse(log);
+                }
+
+                log = $"Service: {serviceDTO.ServiceId} has been added to Doctor: {serviceDTO.DoctorId} with price {serviceDTO.Price}";
+                _logger.LogInformation(message: log);
+                return new OkResponse(log);
+
+            }
+            catch (Exception execption)
+            {
+                _logger.LogError(message: $"{execption.Message}");
+                return new DatabaseExceptionResponse(execption);
             }
         }
     }

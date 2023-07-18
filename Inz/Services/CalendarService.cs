@@ -1,30 +1,24 @@
 ﻿using Inz.DTOModel;
-using Inz.Model;
 using Inz.OneOfHelper;
 using Inz.Repository;
 using OneOf;
-using OneOf.Types;
 
 namespace Inz.Services
 {
     public class CalendarService : ICalendarService
     {
         private readonly ICalendarRepository _calendarRepository;
-        private readonly ILogger _logger;
-        public CalendarService(ICalendarRepository calendarRepository, ILogger<ICalendarRepository> logger)
+        public CalendarService(ICalendarRepository calendarRepository)
         {
             _calendarRepository = calendarRepository;
-            _logger = logger;
-
         }
-        public async Task<OneOf<Calendar, NotFound, DatabaseException>> CreateCalendarAsync(CalendarDTO calendarDTO)
+        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> CreateCalendarAsync(CalendarDTO calendarDTO)
         {
-
             var returnValue = await _calendarRepository.ValidAndCreateCalendarAsync(calendarDTO);
 
             return returnValue.Match(
-                calendar => new Calendar(),
-                notFound => new NotFound(),
+                okResponse => okResponse,
+                notFound => notFound,
                 databaseException => returnValue);   
         }
     }

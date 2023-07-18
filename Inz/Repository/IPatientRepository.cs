@@ -2,14 +2,13 @@
 using Inz.Model;
 using Inz.OneOfHelper;
 using OneOf;
-using OneOf.Types;
 
 namespace Inz.Repository
 {
     public interface IPatientRepository
     {
         public Task InsertPatientAsync(Patient patient);
-        public Task<OneOf<Patient, DatabaseException>> SaveChangesAsync();
-        public Task<OneOf<Patient, NotFound, DatabaseException>> UpdatePatientAsyc(UpdatePatientDTO updatePatientDTO);
+        public Task<OneOf<OkResponse, DatabaseExceptionResponse>> SaveChangesAsync();
+        public Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> UpdatePatientAsyc(UpdatePatientDTO updatePatientDTO);
     }
 }
