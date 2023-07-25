@@ -2,11 +2,15 @@
 {
     public class OkResponse
     {
-        public string Response;
+        public string? ResponseMessage { get; set; }
+
+        public OkResponse()
+        {
+        }
 
         public OkResponse(string response)
         {
-            Response = response;
+            ResponseMessage = response;
         }
     }
 }

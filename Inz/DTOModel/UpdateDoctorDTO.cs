@@ -12,6 +12,6 @@ namespace Inz.DTOModel
         public string PostCode { get; set; } = null!;
         public int AparmentNumber { get; set; }
         public string? Biography { get; set; }
-        public ICollection<int>? MedicalSpecializationId { get; set; }
+        public ICollection<int> MedicalSpecializationsId { get; set; } = new List<int>();
     }
 }

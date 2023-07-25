@@ -31,8 +31,8 @@ namespace Inz.Controllers
             var returnValue = await _calendarService.CreateCalendarAsync(calendarDTO);
 
             var actionResult = returnValue.Match(
-                calendar => Ok(calendar.Response),
-                notFound => BadRequest(notFound.Response),
+                calendar => Ok(calendar.ResponseMessage),
+                notFound => BadRequest(notFound.ResponseMessage),
                 databaseException => Problem($"Cannot connect to the database, please contact Admin@admin.admin | " +
                     $"See inner exception: {databaseException.Exception.Message}"));
 

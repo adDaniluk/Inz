@@ -1,5 +1,4 @@
 ﻿using Inz.DTOModel;
-using Inz.DTOModel.Validators;
 using Inz.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,20 +21,14 @@ namespace Inz.Controllers
         [HttpPost]
         public async Task<IActionResult> InsertPatientAsync(PatientDTO patientDTO)
         {
-            PatientDTOValidator patientDTOvalidator = new PatientDTOValidator();
-            var validatorResult = patientDTOvalidator.Validate(patientDTO);
-
-            if(!validatorResult.IsValid)
-            {
-                return BadRequest(validatorResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" }));
-            }
-
+            _logger.LogInformation(message: $"Calling: {nameof(InsertPatientAsync)}");
+            
             var returnValue = await _patientService.InsertPatientAsync(patientDTO);
 
             IActionResult actionResult = returnValue.Match(
-                patient => Ok(patient.Response),
-                databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
-                    $"See inner exception: {databaseException.Exception.Message}"));
+                okResponse => Ok(okResponse.ResponseMessage),
+                notValidate => BadRequest(notValidate.ValidationResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" })),
+                databaseException => Problem($"{databaseException.Exception}"));
 
             return actionResult;
         }
@@ -44,22 +37,16 @@ namespace Inz.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdatePatientAsync(UpdatePatientDTO updatePatientDTO)
         {
-
-            UpdatePatientDTOValidator updatePatientDTOValidator = new UpdatePatientDTOValidator();
-            var validatorResult = updatePatientDTOValidator.Validate(updatePatientDTO);
-
-            if (!validatorResult.IsValid)
-            {
-                return BadRequest(validatorResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" }));
-            }
-
+            _logger.LogInformation(message: $"Calling {nameof(UpdatePatientAsync)}");
+            
             var returnValue = await _patientService.UpdatePatientAsyc(updatePatientDTO);
 
             IActionResult actionResult = returnValue.Match(
-                patient => Ok(patient.Response),
-                notFound => NotFound(notFound.Response),
+                patient => Ok(patient.ResponseMessage),
+                notFound => NotFound(notFound.ResponseMessage),
+                notValidate => BadRequest(notValidate.ValidationResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" })),
                 databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
-                    $"See inner exception: {databaseException.Exception.Message}"));
+                    $"See inner exception: {databaseException}"));
 
             return actionResult;
         }

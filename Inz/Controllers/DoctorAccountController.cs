@@ -21,21 +21,14 @@ namespace Inz.Controllers
         [HttpPost]
         public async Task<IActionResult> InsertDoctorAsync(DoctorDTO doctorDTO)
         {
-            DotorDTOValidator doctorDTOValidator = new DotorDTOValidator();
-            var validatorResult = doctorDTOValidator.Validate(doctorDTO);
+            _logger.LogInformation($"Calling {nameof(InsertDoctorAsync)}");
 
-            if (!validatorResult.IsValid)
-            {
-                _logger.LogError($"DTO object is not valid: {validatorResult.Errors.First()}");
-                return BadRequest(validatorResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}"}));
-            }
+            var callback = await _doctorService.InsertDoctorAsync(doctorDTO);
 
-            var returnValue = await _doctorService.InsertDoctorAsync(doctorDTO);
-
-            IActionResult actionResult = returnValue.Match(
-                doctor => Ok(doctor.Response),
-                DatabaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
-                    $"See inner exception: {DatabaseException.Exception.Message}"));
+            IActionResult actionResult = callback.Match(
+                doctor => Ok(doctor.ResponseMessage),
+                notValidate => BadRequest(notValidate.ValidationResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" })),
+                databaseException => Problem($"{databaseException.Exception.Message}"));
 
             return actionResult;
         }
@@ -44,21 +37,15 @@ namespace Inz.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO)
         {
-            UpdateDoctorDTOValidator updateDoctorDTOvalidator = new UpdateDoctorDTOValidator();
-            var validatorResult = updateDoctorDTOvalidator.Validate(updateDoctorDTO);
+            _logger.LogInformation($"Calling {nameof(UpdateDoctorAsync)}");
 
-            if(!validatorResult.IsValid)
-            {
-                return BadRequest(validatorResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" }));
-            }
+            var callback = await _doctorService.UpdateDoctorAsync(updateDoctorDTO);
 
-            var returnValue = await _doctorService.UpdateDoctorAsync(updateDoctorDTO);
-
-            IActionResult actionResult = returnValue.Match(
-                patient => Ok(patient.Response),
-                notFound => NotFound(notFound.Response),
-                databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
-                    $"See inner exception: {databaseException.Exception.Message}"));
+            IActionResult actionResult = callback.Match(
+                okResult => Ok(okResult.ResponseMessage),
+                notFound => NotFound(notFound.ResponseMessage),
+                notValidate => BadRequest(notValidate.ValidationResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" })),
+                databaseException => Problem($"{databaseException.Exception.Message}"));
 
             return actionResult;
         }
@@ -78,8 +65,8 @@ namespace Inz.Controllers
             var returnValue = await _doctorService.AddDoctorServiceAsync(serviceDoctorDTO);
 
             IActionResult actionResult = returnValue.Match(
-                doctorServices => Ok(doctorServices.Response),
-                notFound => NotFound(notFound.Response),
+                doctorServices => Ok(doctorServices.ResponseMessage),
+                notFound => NotFound(notFound.ResponseMessage),
                 databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
                     $"See inner exception: {databaseException.Exception.Message}"));
 
@@ -102,8 +89,8 @@ namespace Inz.Controllers
             var returnValue = await _doctorService.RemoveDoctorServiceAsync(serviceDoctorDTO);
 
             IActionResult actionResult = returnValue.Match(
-                doctorServices => Ok(doctorServices.Response),
-                notFound => NotFound(notFound.Response),
+                doctorServices => Ok(doctorServices.ResponseMessage),
+                notFound => NotFound(notFound.ResponseMessage),
                 databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
                     $"See inner exception: {databaseException.Exception.Message}"));
 

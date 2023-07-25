@@ -24,9 +24,7 @@ namespace Inz.Repository
             try
             {
                 string log;
-
                 bool doesDoctorExist = await _dbContextApi.Doctors.AnyAsync(x => x.Id == calendarDTO.DoctorId);
-
                 bool doesDoctorHaveCalendarAlready = await _dbContextApi.Calendars
                     .AnyAsync(x => x.DoctorId == calendarDTO.DoctorId
                             && x.Date == calendarDTO.Date
@@ -58,18 +56,25 @@ namespace Inz.Repository
                 return new DatabaseExceptionResponse(exception);
             }
         }
-        private static List<Calendar> CastCalendarDTOIntoCalendar(CalendarDTO calendarDTO)
+        private List<Calendar> CastCalendarDTOIntoCalendar(CalendarDTO calendarDTO)
         {
+            var status = GetStatus("open");
+
             List<Calendar> calendars = calendarDTO.TimeBlockIds.Select(id => new Calendar
             {
                 Date = calendarDTO.Date,
                 DoctorId = calendarDTO.DoctorId,
                 TimeBlockId = id,
                 Timestamp = DateTime.Now,
-                AlterTimestamp = DateTime.Now
+                AlterTimestamp = DateTime.Now,
+                Status = status.Result // TODO string for getting a proper status as open block of calendar
             }).ToList();
 
             return calendars;
+        }
+        private async Task<Status> GetStatus(string status)
+        {
+            return await _dbContextApi.Statuses.Where(x => x.StatusName == status).FirstAsync();
         }
     }
 }

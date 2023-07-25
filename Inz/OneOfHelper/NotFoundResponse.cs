@@ -2,10 +2,13 @@
 {
     public class NotFoundResponse
     {
-        public string Response;
+        public string? ResponseMessage { get; set; }
         public NotFoundResponse(string response)
         {
-            Response = response;
+            ResponseMessage = response;
+        }
+        public NotFoundResponse()
+        { 
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Inz.Model;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.Design.Serialization;
 
 namespace Inz.Context
 {
@@ -31,11 +30,6 @@ namespace Inz.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<Calendar>()
-                .HasOne(c => c.DoctorVisit)
-                .WithOne(dv => dv.Calendar)
-                .HasForeignKey<DoctorVisit>(dv => dv.CalendarId);
 
             modelBuilder.Entity<CuredDisease>()
                 .HasKey(cd => new { cd.DoctorId, cd.DiseaseId });
