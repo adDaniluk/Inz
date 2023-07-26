@@ -13,14 +13,20 @@ namespace Inz.Services
     {
         private readonly IDoctorRepository _doctorRepository;
         private readonly IMedicalSpecializationRepository _medicalSpecializationRepository; 
+        private readonly IServiceRepository _serviceRepository;
+        private readonly IDoctorServiceRepository _doctorServiceRepository;
         private readonly ILogger _logger;
 
         public DoctorService(IDoctorRepository doctorRepository,
             IMedicalSpecializationRepository medicalSpecializationRepository, 
+            IServiceRepository serviceRepository,
+            IDoctorServiceRepository doctorServiceRepository,
             ILogger<IDoctorService> logger)
         {
             _doctorRepository = doctorRepository;
             _medicalSpecializationRepository = medicalSpecializationRepository;
+            _serviceRepository = serviceRepository;
+            _doctorServiceRepository = doctorServiceRepository;
             _logger = logger;
         }
 
@@ -36,7 +42,7 @@ namespace Inz.Services
                 return new NotValidateResponse(validateResult);
             }
 
-            Doctor doctor = new Doctor()
+            Doctor doctor = new()
             {
                 Login = doctorDTO.Login,
                 Password = doctorDTO.Password,
@@ -59,7 +65,7 @@ namespace Inz.Services
 
             var callbackInsertDoctor = await _doctorRepository.InsertDoctorAsync(doctor);
 
-            if(callbackInsertDoctor.TryPickT0(out OkResponse okResponse, out var dbException))
+            if(callbackInsertDoctor.TryPickT0(out OkResponse okResponse, out DatabaseExceptionResponse dbException))
             {
                 log = "Doctor has been created";
                 _logger.LogInformation(message: log);
@@ -117,7 +123,6 @@ namespace Inz.Services
                     }
                 }
 
-
                 doctorToUpdate.Email = updateDoctorDTO.Email;
                 doctorToUpdate.Phone = updateDoctorDTO.Phone;
                 doctorToUpdate.Address.Street = updateDoctorDTO.Street;
@@ -155,22 +160,75 @@ namespace Inz.Services
             return responseHandler;
         }
 
-        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> AddDoctorServiceAsync(ServiceDoctorDTO serviceDTO)
+        public async Task<OneOf<OkResponse, NotFoundResponse, NotValidateResponse, DatabaseExceptionResponse>> AddDoctorServiceAsync(ServiceDoctorDTO serviceDoctorDTO)
         {
-            //var returnValue = await _doctorRepository.AddDoctorServiceAsync(serviceDTO);
 
-            //return returnValue.Match(
-            //    okResponse => okResponse,
-            //    notFound => notFound,
-            //    databaseException => returnValue);
-            return new OkResponse();
-        }
+            string log;
+            var validateResult = AddDoctorServiceDTOValidation(serviceDoctorDTO);
 
-        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> RemoveDoctorServiceAsync(ServiceDoctorDTO serviceDTO)
-        {
-            var returnValue = await _doctorRepository.RemoveDoctorServiceAsync(serviceDTO);
+            if(!validateResult.IsValid)
+            {
+                log = "DerviceDoctorDTO is not valid";
+                _logger.LogError(message: log);
+                return new NotValidateResponse(validateResult);
+            }
 
-            return new OkResponse();
+            var callbackDoctor = _doctorRepository.GetDoctorAsync(serviceDoctorDTO.DoctorId);
+            var callbackService = _serviceRepository.GetServiceAsync(serviceDoctorDTO.ServiceId);
+            var callbackDoctorService = _doctorServiceRepository.GetDoctorServiceAsync(serviceDoctorDTO.DoctorId, serviceDoctorDTO.ServiceId);
+
+            Task.WaitAll(callbackDoctor, callbackService, callbackDoctorService);
+
+            if(callbackDoctor.Result.IsT2 || callbackService.Result.IsT2 || callbackDoctorService.Result.IsT2)
+            {
+                DatabaseExceptionResponse dbException;
+                dbException = callbackDoctor.Result.IsT2 ? callbackDoctor.Result.AsT2 : (callbackService.Result.IsT2 ? callbackService.Result.AsT2 : callbackDoctorService.Result.AsT2);
+                log = $"Database exception, please look into: {dbException.Exception}";
+                _logger.LogError(message: log);
+                return dbException;
+            }
+
+            if(callbackDoctor.Result.IsT1 || callbackService.Result.IsT1 || callbackDoctorService.Result.IsT0)
+            {
+                if (callbackDoctor.Result.IsT1)
+                {
+                    log = $"Doctor with id {serviceDoctorDTO.DoctorId} does not exist";
+                    _logger.LogInformation(message: log);
+                }
+                else if(callbackService.Result.IsT1)
+                {
+                    log = $"Service with id {serviceDoctorDTO.ServiceId} does not exist";
+                    _logger.LogInformation(message: log);
+                }
+                else
+                {
+                    log = $"DoctorService with service id: {serviceDoctorDTO.ServiceId} and doctor id: {serviceDoctorDTO.DoctorId} already exist.";
+                    _logger.LogInformation(message: log);
+                }
+
+                return new NotFoundResponse(log);
+            }
+
+            Doctor doctor = callbackDoctor.Result.AsT0;
+            Service service = callbackService.Result.AsT0;
+
+            DoctorServices doctorService = new()
+            {
+                Service = service,
+                Doctor = doctor,
+                Price = serviceDoctorDTO.Price
+            };
+
+            var callbackAddDoctorService = await _doctorServiceRepository.AddDoctorServiceAsync(doctorService);
+
+            if(callbackAddDoctorService.IsT0)
+            {
+                log = $"DoctorService has been added";
+                _logger.LogInformation(message: log);
+                return new OkResponse(log);
+            }
+
+            return new DatabaseExceptionResponse(callbackAddDoctorService.AsT1.Exception);
         }
 
         private ValidationResult DoctorDTOValidation(DoctorDTO doctorDTO)
@@ -185,6 +243,14 @@ namespace Inz.Services
         {
             UpdateDoctorDTOValidator updateDoctorDTOValidator = new UpdateDoctorDTOValidator();
             var validatorResult = updateDoctorDTOValidator.Validate(updateDoctorDTO);
+
+            return validatorResult;
+        }
+
+        private ValidationResult AddDoctorServiceDTOValidation(ServiceDoctorDTO serviceDoctorDTO)
+        {
+            ServiceDoctorDTOValidator serviceDoctorDTOValidator = new ServiceDoctorDTOValidator();
+            var validatorResult = serviceDoctorDTOValidator.Validate(serviceDoctorDTO);
 
             return validatorResult;
         }

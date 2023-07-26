@@ -14,7 +14,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<DbContextApi>(option => option.UseSqlServer(
-    builder.Configuration.GetSection("ConnectionDbStrings")["localhostExpress2"]));
+    builder.Configuration.GetSection("ConnectionDbStrings")["localhostExpress2"]), ServiceLifetime.Transient);
+
+
 
 builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
@@ -26,6 +28,8 @@ builder.Services.AddScoped<ICalendarService, CalendarService>();
 builder.Services.AddScoped<ICalendarRepository, CalendarRepository>();
 
 builder.Services.AddScoped<IMedicalSpecializationRepository, MedicalSpecializationRepository>();
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IDoctorServiceRepository, DoctorServiceRepository>();
 
 builder.Host.UseSerilog((ctx, lc)
     => lc.ReadFrom.Configuration(ctx.Configuration));

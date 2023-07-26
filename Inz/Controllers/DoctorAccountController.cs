@@ -50,51 +50,55 @@ namespace Inz.Controllers
             return actionResult;
         }
 
-        [Route("Service")]
+        [Route("AddService")]
         [HttpPost]
         public async Task<IActionResult> AddDoctorServiceAsync(ServiceDoctorDTO serviceDoctorDTO)
         {
-            ServiceDoctorDTOValidator serviceDTOValidator = new ServiceDoctorDTOValidator();
-            var validatorResult = serviceDTOValidator.Validate(serviceDoctorDTO);
+            _logger.LogInformation($"Calling {nameof(AddDoctorServiceAsync)}");
 
-            if(!validatorResult.IsValid)
-            {
-                return BadRequest(validatorResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" }));
-            }
+            //ServiceDoctorDTOValidator serviceDTOValidator = new ServiceDoctorDTOValidator();
+            //var validatorResult = serviceDTOValidator.Validate(serviceDoctorDTO);
 
-            var returnValue = await _doctorService.AddDoctorServiceAsync(serviceDoctorDTO);
+            //if (!validatorResult.IsValid)
+            //{
+            //    return BadRequest(validatorResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" }));
+            //}
 
-            IActionResult actionResult = returnValue.Match(
+            var callback = await _doctorService.AddDoctorServiceAsync(serviceDoctorDTO);
+
+            IActionResult actionResult = callback.Match(
                 doctorServices => Ok(doctorServices.ResponseMessage),
                 notFound => NotFound(notFound.ResponseMessage),
+                notValidate => BadRequest(notValidate.ValidationResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" })),
                 databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
                     $"See inner exception: {databaseException.Exception.Message}"));
 
             return actionResult;
         }
 
-        [Route("Service")]
-        [HttpDelete]
-        public async Task<IActionResult> RemoveDoctorServiceAsync(ServiceDoctorDTO serviceDoctorDTO)
-        { 
-            //TODO what about DTO?
-            RemoveServiceDoctorDTOValidator serviceDTOValidator = new RemoveServiceDoctorDTOValidator();
-            var validatorResult = serviceDTOValidator.Validate(serviceDoctorDTO);
+        //[Route("Service")]
+        //[HttpDelete]
+        //public async Task<IActionResult> RemoveDoctorServiceAsync(ServiceDoctorDTO serviceDoctorDTO)
+        //{ 
+        //    //TODO what about DTO?
+        //    RemoveServiceDoctorDTOValidator serviceDTOValidator = new RemoveServiceDoctorDTOValidator();
+        //    var validatorResult = serviceDTOValidator.Validate(serviceDoctorDTO);
 
-            if (!validatorResult.IsValid)
-            {
-                return BadRequest(validatorResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" }));
-            }
+        //    if (!validatorResult.IsValid)
+        //    {
+        //        return BadRequest(validatorResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" }));
+        //    }
 
-            var returnValue = await _doctorService.RemoveDoctorServiceAsync(serviceDoctorDTO);
+        //    var returnValue = await _doctorService.RemoveDoctorServiceAsync(serviceDoctorDTO);
 
-            IActionResult actionResult = returnValue.Match(
-                doctorServices => Ok(doctorServices.ResponseMessage),
-                notFound => NotFound(notFound.ResponseMessage),
-                databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
-                    $"See inner exception: {databaseException.Exception.Message}"));
+        //    IActionResult actionResult = returnValue.Match(
+        //        doctorServices => Ok(doctorServices.ResponseMessage),
+        //        notFound => NotFound(notFound.ResponseMessage),
+        //        notValidate => BadRequest(validatorResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" })),
+        //        databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
+        //            $"See inner exception: {databaseException.Exception.Message}"));
 
-            return actionResult;
-        }
+        //    return actionResult;
+        //}
     }
 }
