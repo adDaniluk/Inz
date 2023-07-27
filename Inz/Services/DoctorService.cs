@@ -1,4 +1,5 @@
-﻿using FluentValidation.Results;
+﻿using FluentValidation;
+using FluentValidation.Results;
 using Inz.DTOModel;
 using Inz.DTOModel.Validators;
 using Inz.Model;
@@ -30,17 +31,9 @@ namespace Inz.Services
             _logger = logger;
         }
 
-        public async Task<OneOf<OkResponse, NotValidateResponse, DatabaseExceptionResponse>> InsertDoctorAsync(DoctorDTO doctorDTO)
+        public async Task<OneOf<OkResponse, DatabaseExceptionResponse>> InsertDoctorAsync(DoctorDTO doctorDTO)
         {
             string log;
-            var validateResult = DoctorDTOValidation(doctorDTO);
-
-            if(!validateResult.IsValid)
-            {
-                log = "DoctorDTO is not valid";
-                _logger.LogInformation(message: log);
-                return new NotValidateResponse(validateResult);
-            }
 
             Doctor doctor = new()
             {
@@ -78,18 +71,10 @@ namespace Inz.Services
             return dbException;
         }
 
-        public async Task<OneOf<OkResponse, NotFoundResponse, NotValidateResponse, DatabaseExceptionResponse>> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO)
+        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO)
         {
-            OneOf<OkResponse, NotFoundResponse, NotValidateResponse, DatabaseExceptionResponse> responseHandler = new ();
+            OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse> responseHandler = new ();
             string log;
-            var validateResult = UpdateDoctorDTOValidation(updateDoctorDTO);
-
-            if (!validateResult.IsValid)
-            {
-                log = "UpdateDoctorDTO is not valid";
-                _logger.LogError(message: log);
-                return new NotValidateResponse(validateResult);
-            }
 
             var callbackDoctorToUpdate = await _doctorRepository.GetDoctorAsync(updateDoctorDTO.Id);
 
@@ -160,18 +145,10 @@ namespace Inz.Services
             return responseHandler;
         }
 
-        public async Task<OneOf<OkResponse, NotFoundResponse, NotValidateResponse, DatabaseExceptionResponse>> AddDoctorServiceAsync(ServiceDoctorDTO serviceDoctorDTO)
+        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> AddDoctorServiceAsync(ServiceDoctorDTO serviceDoctorDTO)
         {
 
             string log;
-            var validateResult = AddDoctorServiceDTOValidation(serviceDoctorDTO);
-
-            if(!validateResult.IsValid)
-            {
-                log = "DerviceDoctorDTO is not valid";
-                _logger.LogError(message: log);
-                return new NotValidateResponse(validateResult);
-            }
 
             var callbackDoctor = _doctorRepository.GetDoctorAsync(serviceDoctorDTO.DoctorId);
             var callbackService = _serviceRepository.GetServiceAsync(serviceDoctorDTO.ServiceId);
@@ -209,13 +186,10 @@ namespace Inz.Services
                 return new NotFoundResponse(log);
             }
 
-            Doctor doctor = callbackDoctor.Result.AsT0;
-            Service service = callbackService.Result.AsT0;
-
             DoctorServices doctorService = new()
             {
-                Service = service,
-                Doctor = doctor,
+                ServiceId = serviceDoctorDTO.ServiceId,
+                DoctorId = serviceDoctorDTO.DoctorId,
                 Price = serviceDoctorDTO.Price
             };
 
@@ -231,28 +205,11 @@ namespace Inz.Services
             return new DatabaseExceptionResponse(callbackAddDoctorService.AsT1.Exception);
         }
 
-        private ValidationResult DoctorDTOValidation(DoctorDTO doctorDTO)
-        {
-            DotorDTOValidator doctorDTOValidation = new DotorDTOValidator();
-            var validatorResult = doctorDTOValidation.Validate(doctorDTO);
-
-            return validatorResult;
-        }
-
-        private ValidationResult UpdateDoctorDTOValidation(UpdateDoctorDTO updateDoctorDTO)
-        {
-            UpdateDoctorDTOValidator updateDoctorDTOValidator = new UpdateDoctorDTOValidator();
-            var validatorResult = updateDoctorDTOValidator.Validate(updateDoctorDTO);
-
-            return validatorResult;
-        }
-
-        private ValidationResult AddDoctorServiceDTOValidation(ServiceDoctorDTO serviceDoctorDTO)
-        {
-            ServiceDoctorDTOValidator serviceDoctorDTOValidator = new ServiceDoctorDTOValidator();
-            var validatorResult = serviceDoctorDTOValidator.Validate(serviceDoctorDTO);
-
-            return validatorResult;
-        }
+        //private ValidationResult DTOValidation<T, V>(T valueDTO) where V : AbstractValidator<T>, new() where T : IDTOModelValidator, new()
+        //{
+        //    V DTOValidator = new();
+        //    var validatorResult = DTOValidator.Validate(valueDTO);
+        //    return validatorResult;
+        //}
     }
 }

@@ -19,17 +19,9 @@ namespace Inz.Services
             _logger = logger;
         }
 
-        public async Task<OneOf<OkResponse, NotValidateResponse, DatabaseExceptionResponse>> InsertPatientAsync(PatientDTO patientDTO)
+        public async Task<OneOf<OkResponse, DatabaseExceptionResponse>> InsertPatientAsync(PatientDTO patientDTO)
         {
             string log;
-            var validateResult = PatientDTOValidation(patientDTO);
-
-            if (!validateResult.IsValid)
-            {
-                log = "PatientDTO is not valid.";
-                _logger.LogInformation(message: log);
-                return new NotValidateResponse(validateResult);
-            }
 
             Patient patient = new Patient()
             {
@@ -67,16 +59,9 @@ namespace Inz.Services
             return dbException;
         }
 
-        public async Task<OneOf<OkResponse, NotFoundResponse, NotValidateResponse, DatabaseExceptionResponse>> UpdatePatientAsyc(UpdatePatientDTO updatePatientDTO)
+        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> UpdatePatientAsyc(UpdatePatientDTO updatePatientDTO)
         {
             string log;
-            var validateResult = UpdatePatientDTOValidation(updatePatientDTO);
-
-            if (!validateResult.IsValid)
-            {     
-                _logger.LogInformation(message: "PatientDTO is not valid.");
-                return new NotValidateResponse(validateResult);
-            }
 
             var callbackPatientToUpdate = await _patientRepository.GetPatientAsync(updatePatientDTO.Id);
 
@@ -115,20 +100,5 @@ namespace Inz.Services
             _logger.LogError(message: exceptionResponse.Exception.Message);
             return exceptionResponse;
         }
-
-        private static ValidationResult PatientDTOValidation(PatientDTO patientDTO)
-        {
-            PatientDTOValidator patientDTOvalidator = new PatientDTOValidator();
-            var validatorResult = patientDTOvalidator.Validate(patientDTO);
-
-            return validatorResult;
-        }
-
-        private static ValidationResult UpdatePatientDTOValidation(UpdatePatientDTO updatePatientDTO)
-        {
-            UpdatePatientDTOValidator updatePatientDTOValidator = new UpdatePatientDTOValidator();
-            var validatorResult = updatePatientDTOValidator.Validate(updatePatientDTO);
-
-            return validatorResult;
-        }
-    } }
+    }
+}

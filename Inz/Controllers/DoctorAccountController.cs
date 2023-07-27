@@ -1,5 +1,4 @@
 ﻿using Inz.DTOModel;
-using Inz.DTOModel.Validators;
 using Inz.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,7 +26,6 @@ namespace Inz.Controllers
 
             IActionResult actionResult = callback.Match(
                 doctor => Ok(doctor.ResponseMessage),
-                notValidate => BadRequest(notValidate.ValidationResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" })),
                 databaseException => Problem($"{databaseException.Exception.Message}"));
 
             return actionResult;
@@ -44,7 +42,6 @@ namespace Inz.Controllers
             IActionResult actionResult = callback.Match(
                 okResult => Ok(okResult.ResponseMessage),
                 notFound => NotFound(notFound.ResponseMessage),
-                notValidate => BadRequest(notValidate.ValidationResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" })),
                 databaseException => Problem($"{databaseException.Exception.Message}"));
 
             return actionResult;
@@ -56,20 +53,11 @@ namespace Inz.Controllers
         {
             _logger.LogInformation($"Calling {nameof(AddDoctorServiceAsync)}");
 
-            //ServiceDoctorDTOValidator serviceDTOValidator = new ServiceDoctorDTOValidator();
-            //var validatorResult = serviceDTOValidator.Validate(serviceDoctorDTO);
-
-            //if (!validatorResult.IsValid)
-            //{
-            //    return BadRequest(validatorResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" }));
-            //}
-
             var callback = await _doctorService.AddDoctorServiceAsync(serviceDoctorDTO);
 
             IActionResult actionResult = callback.Match(
                 doctorServices => Ok(doctorServices.ResponseMessage),
                 notFound => NotFound(notFound.ResponseMessage),
-                notValidate => BadRequest(notValidate.ValidationResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" })),
                 databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
                     $"See inner exception: {databaseException.Exception.Message}"));
 

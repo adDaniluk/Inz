@@ -27,7 +27,6 @@ namespace Inz.Controllers
 
             IActionResult actionResult = returnValue.Match(
                 okResponse => Ok(okResponse.ResponseMessage),
-                notValidate => BadRequest(notValidate.ValidationResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" })),
                 databaseException => Problem($"{databaseException.Exception}"));
 
             return actionResult;
@@ -44,7 +43,6 @@ namespace Inz.Controllers
             IActionResult actionResult = returnValue.Match(
                 patient => Ok(patient.ResponseMessage),
                 notFound => NotFound(notFound.ResponseMessage),
-                notValidate => BadRequest(notValidate.ValidationResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" })),
                 databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
                     $"See inner exception: {databaseException}"));
 
