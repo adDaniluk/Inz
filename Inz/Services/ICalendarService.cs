@@ -1,5 +1,4 @@
-﻿
-using Inz.DTOModel;
+﻿using Inz.DTOModel;
 using Inz.OneOfHelper;
 using OneOf;
 

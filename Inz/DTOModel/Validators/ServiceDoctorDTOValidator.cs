@@ -2,7 +2,7 @@
 
 namespace Inz.DTOModel.Validators
 {
-    public class ServiceDoctorDTOValidator : AbstractValidator<ServiceDoctorDTO>
+    public class ServiceDoctorDTOValidator : AbstractValidator<DoctorServiceDTO>
     {
         public ServiceDoctorDTOValidator()
         {

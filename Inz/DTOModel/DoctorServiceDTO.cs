@@ -1,6 +1,6 @@
 ﻿namespace Inz.DTOModel
 {
-    public class ServiceDoctorDTO
+    public class DoctorServiceDTO
     {
         public int ServiceId { get; set; }
         public int DoctorId { get; set; }

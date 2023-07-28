@@ -1,12 +1,8 @@
-﻿using FluentValidation;
-using FluentValidation.Results;
-using Inz.DTOModel;
-using Inz.DTOModel.Validators;
+﻿using Inz.DTOModel;
 using Inz.Model;
 using Inz.OneOfHelper;
 using Inz.Repository;
 using OneOf;
-using System.Data.Common;
 
 namespace Inz.Services
 {
@@ -145,7 +141,7 @@ namespace Inz.Services
             return responseHandler;
         }
 
-        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> AddDoctorServiceAsync(ServiceDoctorDTO serviceDoctorDTO)
+        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> AddDoctorServiceAsync(DoctorServiceDTO serviceDoctorDTO)
         {
 
             string log;
@@ -205,11 +201,53 @@ namespace Inz.Services
             return new DatabaseExceptionResponse(callbackAddDoctorService.AsT1.Exception);
         }
 
-        //private ValidationResult DTOValidation<T, V>(T valueDTO) where V : AbstractValidator<T>, new() where T : IDTOModelValidator, new()
-        //{
-        //    V DTOValidator = new();
-        //    var validatorResult = DTOValidator.Validate(valueDTO);
-        //    return validatorResult;
-        //}
+        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> RemoveDoctorServiceAsync(RemoveDoctorServiceDTO removeDoctorServiceDTO)
+        {
+            string log;
+
+            var callbackDoctorService = await _doctorServiceRepository.GetDoctorServiceAsync(removeDoctorServiceDTO.DoctorId, removeDoctorServiceDTO.ServiceId);
+
+            if(callbackDoctorService.TryPickT0(out DoctorServices doctorServices, out var remainderErrors))
+            {
+                DoctorServices doctorServiceToRemove = doctorServices;
+
+                var callbackDeleteServiceDoctor = await _doctorServiceRepository.RemoveDoctorServiceAsync(doctorServiceToRemove);
+               
+                if(callbackDeleteServiceDoctor.TryPickT0(out OkResponse okResponse, out var dbError))
+                {
+                    log = $"DoctorService has been removed successfuly.";
+                    _logger.LogInformation(message: log);
+                    okResponse.ResponseMessage = log;
+                    return okResponse;
+                }
+
+                log = $"Database exception, please look into: {dbError.Exception}";
+                _logger.LogError(message: log);
+                return dbError;
+            }
+
+            if (remainderErrors.IsT0)
+            {
+                log = $"DoctorService does not exist.";
+                _logger.LogInformation(message: log);
+                return new NotFoundResponse(log);
+            }
+            else
+            {
+                log = $"Database exception, please look into: {remainderErrors.AsT1.Exception}";
+                _logger.LogError(message: log);
+                return remainderErrors.AsT1;
+            }
+        }
+
+        //Generic validation method -> as a sample
+        /*
+        private ValidationResult DTOValidation<T, V>(T valueDTO) where V : AbstractValidator<T>, new() where T : IDTOModelValidator, new()
+        {
+            V DTOValidator = new();
+            var validatorResult = DTOValidator.Validate(valueDTO);
+            return validatorResult;
+        }
+        */
     }
 }

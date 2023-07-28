@@ -1,6 +1,4 @@
-﻿using FluentValidation.Results;
-using Inz.DTOModel;
-using Inz.DTOModel.Validators;
+﻿using Inz.DTOModel;
 using Inz.Model;
 using Inz.OneOfHelper;
 using Inz.Repository;

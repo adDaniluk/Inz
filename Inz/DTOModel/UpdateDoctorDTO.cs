@@ -1,6 +1,4 @@
-﻿using Inz.Model;
-
-namespace Inz.DTOModel
+﻿namespace Inz.DTOModel
 {
     public class UpdateDoctorDTO
     {

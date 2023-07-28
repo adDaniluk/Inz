@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using FluentValidation;
-
-namespace Inz.DTOModel
+﻿namespace Inz.DTOModel
 {
     public class UpdatePatientDTO
     {

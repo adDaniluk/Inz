@@ -49,7 +49,7 @@ namespace Inz.Controllers
 
         [Route("AddService")]
         [HttpPost]
-        public async Task<IActionResult> AddDoctorServiceAsync(ServiceDoctorDTO serviceDoctorDTO)
+        public async Task<IActionResult> AddDoctorServiceAsync(DoctorServiceDTO serviceDoctorDTO)
         {
             _logger.LogInformation($"Calling {nameof(AddDoctorServiceAsync)}");
 
@@ -64,29 +64,21 @@ namespace Inz.Controllers
             return actionResult;
         }
 
-        //[Route("Service")]
-        //[HttpDelete]
-        //public async Task<IActionResult> RemoveDoctorServiceAsync(ServiceDoctorDTO serviceDoctorDTO)
-        //{ 
-        //    //TODO what about DTO?
-        //    RemoveServiceDoctorDTOValidator serviceDTOValidator = new RemoveServiceDoctorDTOValidator();
-        //    var validatorResult = serviceDTOValidator.Validate(serviceDoctorDTO);
+        [Route("RemoveService")]
+        [HttpDelete]
+        public async Task<IActionResult> RemoveDoctorServiceAsync(RemoveDoctorServiceDTO removeDoctorServiceDTO)
+        {
+            _logger.LogInformation($"Calling {nameof(RemoveDoctorServiceAsync)}");
 
-        //    if (!validatorResult.IsValid)
-        //    {
-        //        return BadRequest(validatorResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" }));
-        //    }
+            var returnValue = await _doctorService.RemoveDoctorServiceAsync(removeDoctorServiceDTO);
 
-        //    var returnValue = await _doctorService.RemoveDoctorServiceAsync(serviceDoctorDTO);
+            IActionResult actionResult = returnValue.Match(
+                doctorServices => Ok(doctorServices.ResponseMessage),
+                notFound => NotFound(notFound.ResponseMessage),
+                databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
+                    $"See inner exception: {databaseException.Exception.Message}"));
 
-        //    IActionResult actionResult = returnValue.Match(
-        //        doctorServices => Ok(doctorServices.ResponseMessage),
-        //        notFound => NotFound(notFound.ResponseMessage),
-        //        notValidate => BadRequest(validatorResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" })),
-        //        databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
-        //            $"See inner exception: {databaseException.Exception.Message}"));
-
-        //    return actionResult;
-        //}
+            return actionResult;
+        }
     }
 }

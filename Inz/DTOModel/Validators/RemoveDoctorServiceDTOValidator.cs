@@ -2,9 +2,9 @@
 
 namespace Inz.DTOModel.Validators
 {
-    public class RemoveServiceDoctorDTOValidator : AbstractValidator<ServiceDoctorDTO>
+    public class RemoveDoctorServiceDTOValidator : AbstractValidator<RemoveDoctorServiceDTO>
     {
-        public RemoveServiceDoctorDTOValidator()
+        public RemoveDoctorServiceDTOValidator()
         {
             RuleLevelCascadeMode = CascadeMode.Stop;
 

@@ -42,9 +42,35 @@ namespace Inz.Repository
             }
         }
 
-        public Task<OneOf<IList<DoctorServices>, NotFoundResponse, DatabaseExceptionResponse>> GetDoctorServiceByDoctorIdAsync(int id)
+        public async Task<OneOf<IList<DoctorServices>, NotFoundResponse, DatabaseExceptionResponse>> GetDoctorServiceByDoctorIdAsync(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var doctorServicesList = await _dbContextApi.DoctorServices.Where(x => x.DoctorId == id).ToListAsync();
+                if(doctorServicesList.Count == 0)
+                {
+                    return new NotFoundResponse();
+                }
+                return doctorServicesList;
+            }
+            catch (Exception exception)
+            {
+                return new DatabaseExceptionResponse(exception);
+            }
+        }
+
+        public async Task<OneOf<OkResponse, DatabaseExceptionResponse>> RemoveDoctorServiceAsync(DoctorServices doctorServices)
+        {
+            try
+            {
+                _dbContextApi.DoctorServices.Remove(doctorServices);
+                await _dbContextApi.SaveChangesAsync();
+                return new OkResponse();
+            }
+            catch (Exception exception)
+            {
+                return new DatabaseExceptionResponse(exception);
+            }
         }
     }
 }

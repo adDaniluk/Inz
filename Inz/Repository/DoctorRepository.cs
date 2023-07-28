@@ -42,7 +42,7 @@ namespace Inz.Repository
                 return new DatabaseExceptionResponse(exception);
             }
         }
-        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> AddDoctorServiceAsync(ServiceDoctorDTO serviceDTO)
+        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> AddDoctorServiceAsync(DoctorServiceDTO serviceDTO)
         {
             //try
             //{
@@ -86,7 +86,7 @@ namespace Inz.Repository
             return new OkResponse();
         }
 
-        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> RemoveDoctorServiceAsync(ServiceDoctorDTO serviceDTO)
+        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> RemoveDoctorServiceAsync(DoctorServiceDTO serviceDTO)
         {
             //string log;
             //try
