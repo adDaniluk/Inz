@@ -33,9 +33,13 @@ builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 builder.Services.AddScoped<ICalendarService, CalendarService>();
 builder.Services.AddScoped<ICalendarRepository, CalendarRepository>();
 
+builder.Services.AddScoped<IDoctorVisitRepository, DoctorVisitRepository>();
+builder.Services.AddScoped<IDoctorVisitService, DoctorVisitService>();
+
 builder.Services.AddScoped<IMedicalSpecializationRepository, MedicalSpecializationRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IDoctorServiceRepository, DoctorServiceRepository>();
+builder.Services.AddScoped<IStatusRepository, StatusRepository>();
 
 builder.Host.UseSerilog((ctx, lc)
     => lc.ReadFrom.Configuration(ctx.Configuration));

@@ -69,7 +69,7 @@ namespace Inz.Services
 
         public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO)
         {
-            OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse> responseHandler = new ();
+            OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse> responseHandler = new();
             string log;
 
             var callbackDoctorToUpdate = await _doctorRepository.GetDoctorAsync(updateDoctorDTO.Id);
@@ -81,9 +81,9 @@ namespace Inz.Services
                     var medicalSpecializationsToUpdate = await _medicalSpecializationRepository.GetMedicalSpecializationAsync(updateDoctorDTO.MedicalSpecializationsId.ToList());
 
                     medicalSpecializationsToUpdate.Switch(
-                        list =>
+                        medicalSpecializationsList =>
                         {
-                            doctorToUpdate.MedicalSpecializations = list;
+                            doctorToUpdate.MedicalSpecializations = medicalSpecializationsList;
                         },
                         notFound =>
                         {

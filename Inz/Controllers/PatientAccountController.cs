@@ -23,9 +23,9 @@ namespace Inz.Controllers
         {
             _logger.LogInformation(message: $"Calling: {nameof(InsertPatientAsync)}");
             
-            var returnValue = await _patientService.InsertPatientAsync(patientDTO);
+            var callback = await _patientService.InsertPatientAsync(patientDTO);
 
-            IActionResult actionResult = returnValue.Match(
+            IActionResult actionResult = callback.Match(
                 okResponse => Ok(okResponse.ResponseMessage),
                 databaseException => Problem($"{databaseException.Exception}"));
 
@@ -38,9 +38,9 @@ namespace Inz.Controllers
         {
             _logger.LogInformation(message: $"Calling {nameof(UpdatePatientAsync)}");
             
-            var returnValue = await _patientService.UpdatePatientAsyc(updatePatientDTO);
+            var callback = await _patientService.UpdatePatientAsyc(updatePatientDTO);
 
-            IActionResult actionResult = returnValue.Match(
+            IActionResult actionResult = callback.Match(
                 patient => Ok(patient.ResponseMessage),
                 notFound => NotFound(notFound.ResponseMessage),
                 databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +

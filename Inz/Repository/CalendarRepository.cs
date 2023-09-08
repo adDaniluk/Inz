@@ -1,5 +1,4 @@
 ﻿using Inz.Context;
-using Inz.DTOModel;
 using Inz.Model;
 using Inz.OneOfHelper;
 using Microsoft.EntityFrameworkCore;
@@ -19,62 +18,71 @@ namespace Inz.Repository
             _logger = logger;
 
         }
-        public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> ValidAndCreateCalendarAsync(CalendarDTO calendarDTO)
+
+        public async Task<OneOf<OkResponse, DatabaseExceptionResponse>> InsertCalendar(List<Calendar> calendars)
         {
             try
-            {
-                string log;
-                bool doesDoctorExist = await _dbContextApi.Doctors.AnyAsync(x => x.Id == calendarDTO.DoctorId);
-                bool doesDoctorHaveCalendarAlready = await _dbContextApi.Calendars
-                    .AnyAsync(x => x.DoctorId == calendarDTO.DoctorId
-                            && x.Date == calendarDTO.Date
-                            && !calendarDTO.TimeBlockIds.Contains(x.TimeBlockId));
-
-                if (!doesDoctorExist || doesDoctorHaveCalendarAlready)
-                {
-                    log = !doesDoctorExist ?
-                        $"Doctor with Id:{calendarDTO.DoctorId} does not exist." :
-                        $"Calendar cannot be created for the same date/block.";
-
-                    _logger.LogInformation(message: log);
-                    return new NotFoundResponse(log);
-                }
-
-                List<Calendar> calendars = CastCalendarDTOIntoCalendar(calendarDTO);
-
+            { 
                 await _dbContextApi.Calendars.AddRangeAsync(calendars);
-
                 await _dbContextApi.SaveChangesAsync();
-
-                log = "New calendar(s) have been added";
-                _logger.LogInformation(message: log);
-                return new OkResponse(log);
-
+                return new OkResponse();
             }
             catch (Exception exception) {
                 _logger.LogError(message: $"{exception.Message}");
                 return new DatabaseExceptionResponse(exception);
             }
         }
-        private List<Calendar> CastCalendarDTOIntoCalendar(CalendarDTO calendarDTO)
-        {
-            var status = GetStatus("open");
 
-            List<Calendar> calendars = calendarDTO.TimeBlockIds.Select(id => new Calendar
+        public async Task<OneOf<Calendar, NotFoundResponse, DatabaseExceptionResponse>> GetCalendar(int id)
+        {
+            try
             {
-                Date = calendarDTO.Date,
-                DoctorId = calendarDTO.DoctorId,
-                TimeBlockId = id,
-                Timestamp = DateTime.Now,
-                AlterTimestamp = DateTime.Now,
-                Status = status.Result // TODO string for getting a proper status as open block of calendar
-            }).ToList();
+                Calendar? calendar = await _dbContextApi.Calendars.
+                    Where(x => x.Id == id && x.IsDeleted == 0).
+                    Include(x => x.Doctor).
+                    Include(x => x.Status).
+                    Include(x => x.Doctor).
+                    Include(x => x.DoctorVisit).
+                    SingleOrDefaultAsync();
 
-            return calendars;
+                return calendar != null ? calendar : new NotFoundResponse();
+            }
+            catch(Exception exception)
+            {
+                return new DatabaseExceptionResponse(exception);
+            }
         }
-        private async Task<Status> GetStatus(string status)
+
+        public async Task<OneOf<List<Calendar>, DatabaseExceptionResponse>> GetCalendarsByDoctorId(int doctorId)
         {
-            return await _dbContextApi.Statuses.Where(x => x.StatusName == status).FirstAsync();
+            try
+            {
+                List<Calendar> calendars = await _dbContextApi.Calendars
+                    .Where(x => x.DoctorId == doctorId && x.IsDeleted == 0)
+                    .ToListAsync();
+                
+                return calendars;
+            }
+            catch(Exception exception)
+            {
+                return new DatabaseExceptionResponse(exception);
+            }
+        }
+
+        public async Task<OneOf<List<Calendar>, DatabaseExceptionResponse>> GetCalendarListByDateRangeAsync(DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                List<Calendar> calendars = await _dbContextApi.Calendars
+                    .Where(x => x.Date.Date <= endDate && x.Date.Date >= startDate && x.IsDeleted == 0)
+                    .ToListAsync();
+
+                return calendars;
+            }
+            catch(Exception exception)
+            {
+                return new DatabaseExceptionResponse(exception);
+            }
         }
     }
 }

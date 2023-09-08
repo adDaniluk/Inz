@@ -9,6 +9,7 @@ namespace Inz.Repository
     public class ServiceRepository : IServiceRepository
     {
         private readonly DbContextApi _dbContextApi;
+
         public ServiceRepository(DbContextApi dbContextApi)
         {
             _dbContextApi = dbContextApi;

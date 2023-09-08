@@ -70,9 +70,9 @@ namespace Inz.Controllers
         {
             _logger.LogInformation($"Calling {nameof(RemoveDoctorServiceAsync)}");
 
-            var returnValue = await _doctorService.RemoveDoctorServiceAsync(removeDoctorServiceDTO);
+            var callback = await _doctorService.RemoveDoctorServiceAsync(removeDoctorServiceDTO);
 
-            IActionResult actionResult = returnValue.Match(
+            IActionResult actionResult = callback.Match(
                 doctorServices => Ok(doctorServices.ResponseMessage),
                 notFound => NotFound(notFound.ResponseMessage),
                 databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +

@@ -20,12 +20,7 @@ namespace Inz.Repository
             {
                 var medicalSpecializationsList = await _dbContextApi.MedicalSpecializations.Where(x => specializationsIds.Contains(x.Id)).ToListAsync();
 
-                if (medicalSpecializationsList.Any())
-                {
-                    return medicalSpecializationsList;
-                }
-
-                return new NotFoundResponse();
+                return medicalSpecializationsList.Any() ? medicalSpecializationsList : new NotFoundResponse();
             }
             catch (Exception exception)
             {

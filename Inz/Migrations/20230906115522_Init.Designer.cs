@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Inz.Migrations
 {
     [DbContext(typeof(DbContextApi))]
-    [Migration("20230716170232_Update on DoctorService")]
-    partial class UpdateonDoctorService
+    [Migration("20230906115522_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -534,10 +534,9 @@ namespace Inz.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("StatusName")
-                        .IsRequired()
+                    b.Property<int>("StatusName")
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

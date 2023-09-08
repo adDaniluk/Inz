@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Inz.Migrations
 {
     [DbContext(typeof(DbContextApi))]
-    [Migration("20230704095206_Init")]
-    partial class Init
+    [Migration("20230906115859_Status entity chane")]
+    partial class Statusentitychane
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -83,15 +83,12 @@ namespace Inz.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<DateTime?>("DeleteTimestamp")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("DoctorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DoctorVisitId")
                         .HasColumnType("int");
 
                     b.Property<int>("IsDeleted")
@@ -196,7 +193,7 @@ namespace Inz.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("Date");
+                        .HasColumnType("date");
 
                     b.Property<DateTime?>("DeleteTimestamp")
                         .HasColumnType("datetime2");
@@ -251,7 +248,7 @@ namespace Inz.Migrations
                     b.ToTable("Doctors");
                 });
 
-            modelBuilder.Entity("Inz.Model.DoctorService", b =>
+            modelBuilder.Entity("Inz.Model.DoctorServices", b =>
                 {
                     b.Property<int>("ServiceId")
                         .HasColumnType("int");
@@ -364,7 +361,7 @@ namespace Inz.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("Date");
+                        .HasColumnType("date");
 
                     b.Property<DateTime?>("DeleteTimestamp")
                         .HasColumnType("datetime2");
@@ -537,6 +534,9 @@ namespace Inz.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CalendarStatus")
+                        .HasColumnType("int");
+
                     b.Property<string>("StatusName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -673,7 +673,7 @@ namespace Inz.Migrations
                     b.Navigation("Address");
                 });
 
-            modelBuilder.Entity("Inz.Model.DoctorService", b =>
+            modelBuilder.Entity("Inz.Model.DoctorServices", b =>
                 {
                     b.HasOne("Inz.Model.Doctor", "Doctor")
                         .WithMany("DoctorServices")

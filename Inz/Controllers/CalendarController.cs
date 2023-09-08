@@ -1,7 +1,7 @@
 ﻿using Inz.DTOModel;
-using Inz.DTOModel.Validators;
 using Inz.Services;
 using Microsoft.AspNetCore.Mvc;
+using OneOf.Types;
 
 namespace Inz.Controllers
 {
@@ -21,18 +21,50 @@ namespace Inz.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateCalendarAsync(CalendarDTO calendarDTO)
         {
-            CalendarDTOValidator calendarDTOValidator = new CalendarDTOValidator();
-            var validatorResult = calendarDTOValidator.Validate(calendarDTO);
+            _logger.LogInformation($"Calling {nameof(CreateCalendarAsync)}");
 
-            if(!validatorResult.IsValid) {
-                return BadRequest(validatorResult.Errors.ToList().Select(x => new { Error = $"{x.ErrorCode}: {x.ErrorMessage}" }));
-            }
+            var callback = await _calendarService.InsertCalendarAsync(calendarDTO);
 
-            var returnValue = await _calendarService.CreateCalendarAsync(calendarDTO);
-
-            var actionResult = returnValue.Match(
+            var actionResult = callback.Match(
                 calendar => Ok(calendar.ResponseMessage),
-                notFound => BadRequest(notFound.ResponseMessage),
+                notFound => NotFound(notFound.ResponseMessage),
+                databaseException => Problem($"Cannot connect to the database, please contact Admin@admin.admin | " +
+                    $"See inner exception: {databaseException.Exception.Message}"));
+
+            return actionResult;
+        }
+
+        [Route("GetCalendar")]
+        [HttpGet]
+        public async Task<IActionResult> GetCalendarAsync(int id)
+        { 
+            _logger.LogInformation($"Calling {nameof(GetCalendarAsync)}");
+
+            if(id < 0)
+                return NotFound($"{id} cannot be negative");
+
+            var callback = await _calendarService.GetCalendarByIdAsync(id);
+
+            var actionResult = callback.Match(
+                calendar => Ok(calendar),
+                notFound => NotFound(notFound.ResponseMessage),
+                databaseException => Problem($"Cannot connect to the database, please contact Admin@admin.admin | " +
+                    $"See inner exception: {databaseException.Exception.Message}"));
+
+            return actionResult;
+        }
+
+        [Route("GetCalendars")]
+        [HttpGet]
+        public async Task<IActionResult> GetCalendarListByDateRangeAsync(DateTime startDate, DateTime endDate)
+        {
+            _logger.LogInformation($"Calling {nameof(GetCalendarListByDateRangeAsync)}");
+
+            var callback = await _calendarService.GetCalendarListByDateRangeAsync(startDate, endDate);
+
+            var actionResult = callback.Match(
+                calendar => Ok(calendar),
+                notFound => NotFound(notFound.ResponseMessage),
                 databaseException => Problem($"Cannot connect to the database, please contact Admin@admin.admin | " +
                     $"See inner exception: {databaseException.Exception.Message}"));
 

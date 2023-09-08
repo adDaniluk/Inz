@@ -19,7 +19,7 @@ namespace Inz.DTOModel.Validators
             RuleFor(p => p.Phone).NotNull().NotEmpty().InclusiveBetween(100000000, 999999999).WithMessage("Please provide your number phone - it should have 9 digits");
             RuleFor(p => p.Street).NotNull().NotEmpty().Length(3, 200);
             RuleFor(p => p.AparmentNumber).NotEmpty().NotNull();
-            RuleFor(p => p.LicenseNumber).NotNull().NotEmpty();
+            RuleFor(p => p.LicenseNumber).NotNull().NotEmpty().InclusiveBetween(100000, 999999).WithMessage("A license number should be a 6-digit number");
         }
     }
 }
