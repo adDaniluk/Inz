@@ -12,24 +12,43 @@ namespace Inz.Services
         private readonly IMedicalSpecializationRepository _medicalSpecializationRepository; 
         private readonly IServiceRepository _serviceRepository;
         private readonly IDoctorServiceRepository _doctorServiceRepository;
+        private readonly IDiseaseRepository _diseaseRepository;
         private readonly ILogger _logger;
 
         public DoctorService(IDoctorRepository doctorRepository,
             IMedicalSpecializationRepository medicalSpecializationRepository, 
             IServiceRepository serviceRepository,
             IDoctorServiceRepository doctorServiceRepository,
+            IDiseaseRepository diseaseRepository,
             ILogger<IDoctorService> logger)
         {
             _doctorRepository = doctorRepository;
             _medicalSpecializationRepository = medicalSpecializationRepository;
             _serviceRepository = serviceRepository;
             _doctorServiceRepository = doctorServiceRepository;
+            _diseaseRepository = diseaseRepository;
             _logger = logger;
         }
 
-        public async Task<OneOf<OkResponse, DatabaseExceptionResponse>> InsertDoctorAsync(DoctorDTO doctorDTO)
+        public async Task<OneOf<OkResponse, AlreadyExistResponse, DatabaseExceptionResponse>> InsertDoctorAsync(DoctorDTO doctorDTO)
         {
             string log;
+
+            var callbackCheckLoginAvailability = await _doctorRepository.CheckExistingLoginAsync(doctorDTO.Login);
+
+            if(callbackCheckLoginAvailability.TryPickT1(out var databaseException, out var loginAvailibilityCheck))
+            {
+                log = $"Error on a database, see inner exception: {databaseException.Exception.Message}";
+                _logger.LogError(message: log);
+                return databaseException;
+            }
+
+            if (!loginAvailibilityCheck)
+            {
+                log = $"Login with a name {doctorDTO.Login} is already taken, please insert a new one - has to be uniq";
+                _logger.LogError(message: log);
+                return new AlreadyExistResponse(log);
+            }
 
             Doctor doctor = new()
             {
@@ -83,25 +102,41 @@ namespace Inz.Services
                     medicalSpecializationsToUpdate.Switch(
                         medicalSpecializationsList =>
                         {
-                            doctorToUpdate.MedicalSpecializations = medicalSpecializationsList;
-                        },
-                        notFound =>
-                        {
-                            log = "Provided medical specialization(s) does not exist";
-                            _logger.LogInformation(message: log);
-                            responseHandler = new NotFoundResponse(log);
+                            if (medicalSpecializationsList.Any())
+                            {
+                                doctorToUpdate.MedicalSpecializations = medicalSpecializationsList;
+                            }
                         },
                         dbException =>
                         {
-                            log = $"Database exception, please look into: {dbException.Exception}";
+                            log = $"Database exception, please look into: {dbException.Exception.Message}";
                             _logger.LogError(message: log);
                             responseHandler = dbException;
                         });
 
-                    if (!medicalSpecializationsToUpdate.IsT0)
+                    if (medicalSpecializationsToUpdate.IsT1)
                     {
                         return responseHandler;
                     }
+                }
+
+                if(updateDoctorDTO.CuredDiseasesId.Any())
+                {
+                    var curedDiseasesToUpdate = await _diseaseRepository.GetDiseaseAsync(updateDoctorDTO.CuredDiseasesId.ToList());
+
+                    curedDiseasesToUpdate.Switch(
+                        curedDiseasesList => {
+
+                            if (curedDiseasesList.Any())
+                            {
+
+                                //doctorToUpdate.CuredDiseases = curedDiseasesList;
+                            }
+                        },
+                    dbException =>
+                    {
+
+                    });
                 }
 
                 doctorToUpdate.Email = updateDoctorDTO.Email;
@@ -118,7 +153,7 @@ namespace Inz.Services
                 if (callbackUpdateDoctor.TryPickT0(out OkResponse okResponse, out DatabaseExceptionResponse dbErrorResponse))
                 {
                     log = $"Doctor with ID: {updateDoctorDTO.Id} has been updated";
-                    _logger.LogInformation(log);
+                    _logger.LogInformation(message: log);
                     return new OkResponse(log);
                 }
 

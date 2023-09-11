@@ -55,5 +55,18 @@ namespace Inz.Repository
                 return new DatabaseExceptionResponse(exception);
             }
         }
+
+        public async Task<OneOf<bool, DatabaseExceptionResponse>> CheckExistingLoginAsync(string login)
+        {
+            try
+            {
+                Patient? patient = await _dbContextApi.Patients.SingleOrDefaultAsync(x => x.Login.ToLower() == login.ToLower());
+                return patient == null;
+            }
+            catch(Exception exception)
+            {
+                return new DatabaseExceptionResponse(exception);
+            }
+        }
     }
 }

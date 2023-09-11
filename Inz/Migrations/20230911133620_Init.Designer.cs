@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Inz.Migrations
 {
     [DbContext(typeof(DbContextApi))]
-    [Migration("20230906115859_Status entity chane")]
-    partial class Statusentitychane
+    [Migration("20230911133620_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,21 @@ namespace Inz.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("DoctorCuredDiseases", b =>
+                {
+                    b.Property<int>("CuredDiseasesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DoctorsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CuredDiseasesId", "DoctorsId");
+
+                    b.HasIndex("DoctorsId");
+
+                    b.ToTable("DoctorCuredDiseases");
+                });
 
             modelBuilder.Entity("DoctorMedicalSpecialization", b =>
                 {
@@ -125,21 +140,6 @@ namespace Inz.Migrations
                     b.HasIndex("TimeBlockId");
 
                     b.ToTable("Calendars");
-                });
-
-            modelBuilder.Entity("Inz.Model.CuredDisease", b =>
-                {
-                    b.Property<int>("DoctorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DiseaseId")
-                        .HasColumnType("int");
-
-                    b.HasKey("DoctorId", "DiseaseId");
-
-                    b.HasIndex("DiseaseId");
-
-                    b.ToTable("CuredDiseases");
                 });
 
             modelBuilder.Entity("Inz.Model.Disease", b =>
@@ -570,6 +570,21 @@ namespace Inz.Migrations
                     b.ToTable("TimeBlocks");
                 });
 
+            modelBuilder.Entity("DoctorCuredDiseases", b =>
+                {
+                    b.HasOne("Inz.Model.Disease", null)
+                        .WithMany()
+                        .HasForeignKey("CuredDiseasesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Inz.Model.Doctor", null)
+                        .WithMany()
+                        .HasForeignKey("DoctorsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("DoctorMedicalSpecialization", b =>
                 {
                     b.HasOne("Inz.Model.Doctor", null)
@@ -622,25 +637,6 @@ namespace Inz.Migrations
                     b.Navigation("Status");
 
                     b.Navigation("TimeBlock");
-                });
-
-            modelBuilder.Entity("Inz.Model.CuredDisease", b =>
-                {
-                    b.HasOne("Inz.Model.Disease", "Disease")
-                        .WithMany("CuredDiseases")
-                        .HasForeignKey("DiseaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Inz.Model.Doctor", "Doctor")
-                        .WithMany("CuredDiseases")
-                        .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Disease");
-
-                    b.Navigation("Doctor");
                 });
 
             modelBuilder.Entity("Inz.Model.DiseaseSuspicion", b =>
@@ -775,16 +771,12 @@ namespace Inz.Migrations
 
             modelBuilder.Entity("Inz.Model.Disease", b =>
                 {
-                    b.Navigation("CuredDiseases");
-
                     b.Navigation("DiseaseSuspicions");
                 });
 
             modelBuilder.Entity("Inz.Model.Doctor", b =>
                 {
                     b.Navigation("Calendars");
-
-                    b.Navigation("CuredDiseases");
 
                     b.Navigation("DoctorServices");
                 });

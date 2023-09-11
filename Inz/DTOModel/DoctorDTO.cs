@@ -17,5 +17,6 @@
         public int LicenseNumber { get; set; }
         public string? Biography { get; set; }
         public ICollection<int>? MedicalSpecializationId { get; set; }
+        public ICollection<int>? CuredDiseasesId { get; set; }
     }
 }

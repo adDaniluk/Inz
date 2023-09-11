@@ -100,7 +100,8 @@ namespace Inz.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    StatusName = table.Column<int>(type: "int", maxLength: 100, nullable: false)
+                    CalendarStatus = table.Column<int>(type: "int", nullable: false),
+                    StatusName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -186,24 +187,24 @@ namespace Inz.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CuredDiseases",
+                name: "DoctorCuredDiseases",
                 columns: table => new
                 {
-                    DoctorId = table.Column<int>(type: "int", nullable: false),
-                    DiseaseId = table.Column<int>(type: "int", nullable: false)
+                    CuredDiseasesId = table.Column<int>(type: "int", nullable: false),
+                    DoctorsId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CuredDiseases", x => new { x.DoctorId, x.DiseaseId });
+                    table.PrimaryKey("PK_DoctorCuredDiseases", x => new { x.CuredDiseasesId, x.DoctorsId });
                     table.ForeignKey(
-                        name: "FK_CuredDiseases_Diseases_DiseaseId",
-                        column: x => x.DiseaseId,
+                        name: "FK_DoctorCuredDiseases_Diseases_CuredDiseasesId",
+                        column: x => x.CuredDiseasesId,
                         principalTable: "Diseases",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CuredDiseases_Doctors_DoctorId",
-                        column: x => x.DoctorId,
+                        name: "FK_DoctorCuredDiseases_Doctors_DoctorsId",
+                        column: x => x.DoctorsId,
                         principalTable: "Doctors",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -457,14 +458,14 @@ namespace Inz.Migrations
                 column: "TimeBlockId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CuredDiseases_DiseaseId",
-                table: "CuredDiseases",
-                column: "DiseaseId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_DiseaseSuspicions_DiseaseId",
                 table: "DiseaseSuspicions",
                 column: "DiseaseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DoctorCuredDiseases_DoctorsId",
+                table: "DoctorCuredDiseases",
+                column: "DoctorsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DoctorMedicalSpecialization_MedicalSpecializationsId",
@@ -520,10 +521,10 @@ namespace Inz.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CuredDiseases");
+                name: "DiseaseSuspicions");
 
             migrationBuilder.DropTable(
-                name: "DiseaseSuspicions");
+                name: "DoctorCuredDiseases");
 
             migrationBuilder.DropTable(
                 name: "DoctorMedicalSpecialization");

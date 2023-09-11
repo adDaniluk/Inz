@@ -39,7 +39,7 @@ namespace Inz.Services
                 notFound =>
                 {
                     log = $"Doctor with id {calendarDTO.DoctorId} does not exist.";
-                    _logger.LogInformation(log);
+                    _logger.LogInformation(message: log);
                     responseHandler = new NotFoundResponse(log);
                 },
                 dbException =>
@@ -130,7 +130,7 @@ namespace Inz.Services
                 (okResponse => responseHandler = okResponse,
                 notFound => {
                     log = $"Calendar with Id:{id} does not exist.";
-                    _logger.LogInformation(log);
+                    _logger.LogInformation(message: log);
                     responseHandler = new NotFoundResponse(log);
                 },
                 databaseException => {

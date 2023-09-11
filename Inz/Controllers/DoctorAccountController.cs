@@ -26,6 +26,7 @@ namespace Inz.Controllers
 
             IActionResult actionResult = callback.Match(
                 doctor => Ok(doctor.ResponseMessage),
+                conflict => Conflict(conflict.ResponseMessage),
                 databaseException => Problem($"{databaseException.Exception.Message}"));
 
             return actionResult;

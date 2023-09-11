@@ -11,5 +11,6 @@
         public int AparmentNumber { get; set; }
         public string? Biography { get; set; }
         public ICollection<int> MedicalSpecializationsId { get; set; } = new List<int>();
+        public ICollection<int> CuredDiseasesId { get; set; } = new List<int>();
     }
 }

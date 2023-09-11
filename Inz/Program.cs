@@ -36,6 +36,7 @@ builder.Services.AddScoped<ICalendarRepository, CalendarRepository>();
 builder.Services.AddScoped<IDoctorVisitRepository, DoctorVisitRepository>();
 builder.Services.AddScoped<IDoctorVisitService, DoctorVisitService>();
 
+builder.Services.AddScoped<IDiseaseRepository, DiseaseRepository>();
 builder.Services.AddScoped<IMedicalSpecializationRepository, MedicalSpecializationRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IDoctorServiceRepository, DoctorServiceRepository>();

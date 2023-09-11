@@ -14,13 +14,13 @@ namespace Inz.Repository
             _dbContextApi = dbContextApi;
         }
 
-        public async Task<OneOf<IList<MedicalSpecialization>, NotFoundResponse, DatabaseExceptionResponse>> GetMedicalSpecializationAsync(List<int> specializationsIds)
+        public async Task<OneOf<IList<MedicalSpecialization>, DatabaseExceptionResponse>> GetMedicalSpecializationAsync(List<int> specializationsIds)
         {
             try
             {
                 var medicalSpecializationsList = await _dbContextApi.MedicalSpecializations.Where(x => specializationsIds.Contains(x.Id)).ToListAsync();
 
-                return medicalSpecializationsList.Any() ? medicalSpecializationsList : new NotFoundResponse();
+                return medicalSpecializationsList;
             }
             catch (Exception exception)
             {

@@ -14,6 +14,6 @@ namespace Inz.Model
         public virtual ICollection<Calendar>? Calendars { get; set; }
         public virtual ICollection<MedicalSpecialization>? MedicalSpecializations { get; set; }
         public virtual ICollection<DoctorServices>? DoctorServices { get; set; }
-        public virtual ICollection<CuredDisease>? CuredDiseases { get; set; } 
+        public virtual ICollection<Disease>? CuredDiseases { get; set; } 
     }
 }

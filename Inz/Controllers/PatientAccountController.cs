@@ -27,7 +27,8 @@ namespace Inz.Controllers
 
             IActionResult actionResult = callback.Match(
                 okResponse => Ok(okResponse.ResponseMessage),
-                databaseException => Problem($"{databaseException.Exception}"));
+                conflict => Conflict(conflict.ResponseMessage),
+                databaseException => Problem($"{databaseException}"));
 
             return actionResult;
         }
@@ -43,8 +44,7 @@ namespace Inz.Controllers
             IActionResult actionResult = callback.Match(
                 patient => Ok(patient.ResponseMessage),
                 notFound => NotFound(notFound.ResponseMessage),
-                databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
-                    $"See inner exception: {databaseException}"));
+                databaseException => Problem($"{databaseException}"));
 
             return actionResult;
         }

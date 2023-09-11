@@ -3,6 +3,7 @@ using Inz.Model;
 using Inz.OneOfHelper;
 using Inz.Repository;
 using OneOf;
+using System.Data.Common;
 
 namespace Inz.Services
 {
@@ -17,9 +18,28 @@ namespace Inz.Services
             _logger = logger;
         }
 
-        public async Task<OneOf<OkResponse, DatabaseExceptionResponse>> InsertPatientAsync(PatientDTO patientDTO)
+        public async Task<OneOf<OkResponse, AlreadyExistResponse, DatabaseExceptionResponse>> InsertPatientAsync(PatientDTO patientDTO)
         {
             string log;
+
+            //TODO check existing Login of the doctor/user
+
+            var callbackCheckLoginAvailability = await _patientRepository.CheckExistingLoginAsync(patientDTO.Login);
+
+            if (callbackCheckLoginAvailability.TryPickT1(out var dbErrorLoginCheck, out var loginAvailibilityCheck))
+            {
+                log = $"Error on a database, see inner exception: {dbErrorLoginCheck.Exception.Message}";
+                _logger.LogError(message: log);
+                return dbErrorLoginCheck;
+            }
+
+            if(!loginAvailibilityCheck)
+            {
+                log = $"Login with a name {patientDTO.Login} is already taken, please insert a new one - has to be uniq";
+                _logger.LogError(message: log);
+                return new AlreadyExistResponse(log);
+            }
+            
 
             Patient patient = new Patient()
             {
@@ -44,7 +64,7 @@ namespace Inz.Services
 
             var callbackInsertPatient = await _patientRepository.InsertPatientAsync(patient);
 
-            if (callbackInsertPatient.TryPickT0(out OkResponse okResponse, out DatabaseExceptionResponse dbException))
+            if (callbackInsertPatient.TryPickT0(out var okResponse, out var dbException))
             {
                 log = "Patient has been added";
                 _logger.LogInformation(message: log);
@@ -91,11 +111,13 @@ namespace Inz.Services
                     return okResponse;
                 }
 
-                _logger.LogError(message: exceptionOnUpdate.Exception.Message);
+                log = $"Error on a database, see inner exception: {exceptionOnUpdate.Exception.Message}";
+                _logger.LogError(message: log);
                 return exceptionOnUpdate;
             }
 
-            _logger.LogError(message: exceptionResponse.Exception.Message);
+            log = $"Error on a database, see inner exception: {exceptionResponse.Exception.Message}";
+            _logger.LogError(message: log);
             return exceptionResponse;
         }
     }

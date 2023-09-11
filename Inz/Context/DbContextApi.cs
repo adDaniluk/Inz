@@ -18,7 +18,6 @@ namespace Inz.Context
         public DbSet<Disease> Diseases { get; set; }
         public DbSet<Status> Statuses { get; set; }
         public DbSet<TimeBlock> TimeBlocks { get; set; }
-        public DbSet<CuredDisease> CuredDiseases { get; set; }
         public DbSet<DoctorVisit> DoctorVisits { get; set; }
         public DbSet<MedicalSpecialization> MedicalSpecializations { get; set; }
         public DbSet<Medicine> Medicines { get; set; }
@@ -31,9 +30,6 @@ namespace Inz.Context
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<CuredDisease>()
-                .HasKey(cd => new { cd.DoctorId, cd.DiseaseId });
-
             modelBuilder.Entity<DiseaseSuspicion>()
                 .HasKey(ds => new { ds.DoctorVisitId, ds.DiseaseId });
 
@@ -41,6 +37,11 @@ namespace Inz.Context
                 .HasMany(d => d.MedicalSpecializations)
                 .WithMany(ms => ms.Doctors)
                 .UsingEntity("DoctorMedicalSpecialization");
+
+            modelBuilder.Entity<Doctor>()
+                 .HasMany(d => d.CuredDiseases)
+                 .WithMany(d => d.Doctors)
+                 .UsingEntity("DoctorCuredDiseases");
 
             modelBuilder.Entity<DoctorServices>()
                 .HasKey(ds => new {ds.ServiceId , ds.DoctorId });
