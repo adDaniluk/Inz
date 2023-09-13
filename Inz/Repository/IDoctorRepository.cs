@@ -1,5 +1,4 @@
-﻿using Inz.DTOModel;
-using Inz.Model;
+﻿using Inz.Model;
 using Inz.OneOfHelper;
 using OneOf;
 
@@ -9,6 +8,7 @@ namespace Inz.Repository
     {
         public Task<OneOf<OkResponse, DatabaseExceptionResponse>> InsertDoctorAsync(Doctor doctor);
         public Task<OneOf<Doctor, NotFoundResponse, DatabaseExceptionResponse>> GetDoctorAsync(int id);
+        public Task<OneOf<string, DatabaseExceptionResponse>> GetPasswordAsync(string login);
         public Task<OneOf<OkResponse, DatabaseExceptionResponse>> UpdateDoctorAsync(Doctor doctor);
         public Task<OneOf<bool, DatabaseExceptionResponse>> CheckExistingLoginAsync(string login);
     }

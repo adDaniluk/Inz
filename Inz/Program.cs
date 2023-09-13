@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using FluentValidation.AspNetCore;
 using System.Reflection;
+using Inz.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,11 +37,15 @@ builder.Services.AddScoped<ICalendarRepository, CalendarRepository>();
 builder.Services.AddScoped<IDoctorVisitRepository, DoctorVisitRepository>();
 builder.Services.AddScoped<IDoctorVisitService, DoctorVisitService>();
 
+
 builder.Services.AddScoped<IDiseaseRepository, DiseaseRepository>();
 builder.Services.AddScoped<IMedicalSpecializationRepository, MedicalSpecializationRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IDoctorServiceRepository, DoctorServiceRepository>();
 builder.Services.AddScoped<IStatusRepository, StatusRepository>();
+
+builder.Services.AddScoped<IPasswordHashService, PasswordHashService>();
+builder.Services.AddScoped<ILoginService, LoginService>();
 
 builder.Host.UseSerilog((ctx, lc)
     => lc.ReadFrom.Configuration(ctx.Configuration));

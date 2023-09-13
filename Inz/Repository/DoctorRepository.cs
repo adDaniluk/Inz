@@ -73,5 +73,19 @@ namespace Inz.Repository
                 return new DatabaseExceptionResponse(exception);
             }
         }
+
+        public async Task<OneOf<string, DatabaseExceptionResponse>> GetPasswordAsync(string login)
+        {
+            try
+            {
+                Doctor? doctor = await _dbContextApi.Doctors.SingleOrDefaultAsync(x => x.Login == login);
+                return doctor == null ? "" : doctor.Password;
+
+            }
+            catch(Exception exception)
+            {
+                return new DatabaseExceptionResponse(exception);
+            }
+        }
     }
 }

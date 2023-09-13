@@ -10,19 +10,21 @@ namespace Inz.Services
     public class PatientService : IPatientService
     {
         private readonly IPatientRepository _patientRepository;
+        private readonly IPasswordHashService _passwordHashService;
         private readonly ILogger _logger;
 
-        public PatientService(IPatientRepository patientRepository, ILogger<IPatientService> logger)
+        public PatientService(IPatientRepository patientRepository,
+            ILogger<IPatientService> logger,
+            IPasswordHashService passwordHashService)
         {
             _patientRepository = patientRepository;
+            _passwordHashService = passwordHashService;
             _logger = logger;
         }
 
         public async Task<OneOf<OkResponse, AlreadyExistResponse, DatabaseExceptionResponse>> InsertPatientAsync(PatientDTO patientDTO)
         {
             string log;
-
-            //TODO check existing Login of the doctor/user
 
             var callbackCheckLoginAvailability = await _patientRepository.CheckExistingLoginAsync(patientDTO.Login);
 
@@ -39,12 +41,11 @@ namespace Inz.Services
                 _logger.LogError(message: log);
                 return new AlreadyExistResponse(log);
             }
-            
 
             Patient patient = new Patient()
             {
                 Login = patientDTO.Login,
-                Password = patientDTO.Password,
+                Password = _passwordHashService.GetHash(patientDTO.Password),
                 UserId = patientDTO.UserId,
                 Email = patientDTO.Email,
                 Phone = patientDTO.Phone,

@@ -22,7 +22,7 @@ namespace Inz.Controllers
         public async Task<IActionResult> InsertPatientAsync(PatientDTO patientDTO)
         {
             _logger.LogInformation(message: $"Calling: {nameof(InsertPatientAsync)}");
-            
+
             var callback = await _patientService.InsertPatientAsync(patientDTO);
 
             IActionResult actionResult = callback.Match(

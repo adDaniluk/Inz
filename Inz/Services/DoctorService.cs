@@ -14,19 +14,24 @@ namespace Inz.Services
         private readonly IDoctorServiceRepository _doctorServiceRepository;
         private readonly IDiseaseRepository _diseaseRepository;
         private readonly ILogger _logger;
+        private readonly IPasswordHashService _passwordHashService;
+        
+        
 
         public DoctorService(IDoctorRepository doctorRepository,
             IMedicalSpecializationRepository medicalSpecializationRepository, 
             IServiceRepository serviceRepository,
             IDoctorServiceRepository doctorServiceRepository,
             IDiseaseRepository diseaseRepository,
-            ILogger<IDoctorService> logger)
+            ILogger<IDoctorService> logger,
+            IPasswordHashService passwordHashService)
         {
             _doctorRepository = doctorRepository;
             _medicalSpecializationRepository = medicalSpecializationRepository;
             _serviceRepository = serviceRepository;
             _doctorServiceRepository = doctorServiceRepository;
             _diseaseRepository = diseaseRepository;
+            _passwordHashService = passwordHashService;
             _logger = logger;
         }
 
@@ -53,7 +58,7 @@ namespace Inz.Services
             Doctor doctor = new()
             {
                 Login = doctorDTO.Login,
-                Password = doctorDTO.Password,
+                Password = _passwordHashService.GetHash(doctorDTO.Password),
                 UserId = doctorDTO.UserId,
                 Email = doctorDTO.Email,
                 Phone = doctorDTO.Phone,
@@ -130,13 +135,20 @@ namespace Inz.Services
                             if (curedDiseasesList.Any())
                             {
 
-                                //doctorToUpdate.CuredDiseases = curedDiseasesList;
+                                doctorToUpdate.CuredDiseases = curedDiseasesList;
                             }
                         },
                     dbException =>
                     {
-
+                        log = $"Database exception, please look into: {dbException.Exception.Message}";
+                        _logger.LogError(message: log);
+                        responseHandler = dbException;
                     });
+
+                    if (curedDiseasesToUpdate.IsT1)
+                    {
+                        return responseHandler;
+                    }
                 }
 
                 doctorToUpdate.Email = updateDoctorDTO.Email;
