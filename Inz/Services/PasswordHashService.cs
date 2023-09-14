@@ -1,4 +1,5 @@
-﻿using Inz.Model;
+﻿using Inz.DTOModel;
+using Inz.Model;
 using Inz.OneOfHelper;
 using Inz.Repository;
 using OneOf;
@@ -25,21 +26,21 @@ namespace Inz.Services
             return BCrypt.Net.BCrypt.HashPassword(password);
         }
 
-        public async Task<OneOf<bool, DatabaseExceptionResponse>> ValidatePassword(string password, string login, PersonType personType)
+        public async Task<OneOf<bool, DatabaseExceptionResponse>> ValidatePassword(LoginDTO loginDTO)
         {
             string log;
             OneOf<string, DatabaseExceptionResponse> callbackPassword = new();
 
-            switch (personType)
+            switch (loginDTO.PersonType)
             {
                 case PersonType.Doctor:
                     {
-                        callbackPassword = await _doctorRepository.GetPasswordAsync(login);
+                        callbackPassword = await _doctorRepository.GetPasswordAsync(loginDTO.Login);
                     }
                     break;
                 case PersonType.Patient:
                     {
-                        callbackPassword = await _patientRepository.GetPasswordAsync(login);
+                        callbackPassword = await _patientRepository.GetPasswordAsync(loginDTO.Login);
                     }
                     break;
             }
@@ -51,7 +52,7 @@ namespace Inz.Services
                 return dbError;
             }
 
-            return BCrypt.Net.BCrypt.Verify(password, hashPassword);
+            return hashPassword != "" ? BCrypt.Net.BCrypt.Verify(loginDTO.Password, hashPassword) : false;
         }
     }
 }

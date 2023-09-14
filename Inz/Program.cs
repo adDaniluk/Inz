@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using FluentValidation.AspNetCore;
 using System.Reflection;
-using Inz.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +48,8 @@ builder.Services.AddScoped<ILoginService, LoginService>();
 
 builder.Host.UseSerilog((ctx, lc)
     => lc.ReadFrom.Configuration(ctx.Configuration));
+
+builder.Configuration.AddUserSecrets<Program>(true);
 
 var app = builder.Build();
 

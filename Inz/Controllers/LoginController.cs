@@ -1,9 +1,12 @@
 ﻿using Inz.DTOModel;
 using Inz.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Inz.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class LoginController : ControllerBase, ILoginController
     {
         private readonly ILoginService _loginService;
@@ -15,15 +18,20 @@ namespace Inz.Controllers
             _logger = logger;
         }
 
-        [Route("Login")]
         [HttpPost]
         public async Task<IActionResult> LoginAsync(LoginDTO loginDTO)
         {
             _logger.LogInformation(message: $"Calling {nameof(LoginAsync)}");
 
-            //var callback = await _loginService
+            var callback = await _loginService.SignIn(loginDTO);
 
-            return Ok();
+            IActionResult response =  callback.Match(
+                okResponse => Ok(okResponse.ResponseMessage),
+                notAutorizedResponse => Ok(notAutorizedResponse.ReponseMessage),
+                databaseException => Problem(databaseException.Exception.Message)
+                );
+
+            return response;
         }
     }
 }
