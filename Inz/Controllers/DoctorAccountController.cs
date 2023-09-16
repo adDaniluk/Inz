@@ -1,5 +1,6 @@
 ﻿using Inz.DTOModel;
 using Inz.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Inz.Controllers
@@ -34,6 +35,7 @@ namespace Inz.Controllers
 
         [Route("Update")]
         [HttpPut]
+        [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO)
         {
             _logger.LogInformation($"Calling {nameof(UpdateDoctorAsync)}");

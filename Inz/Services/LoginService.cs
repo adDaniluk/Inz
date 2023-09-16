@@ -3,6 +3,7 @@ using Inz.Model;
 using Inz.OneOfHelper;
 using Microsoft.IdentityModel.Tokens;
 using OneOf;
+using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -61,12 +62,9 @@ namespace Inz.Services
         {
             List<Claim> claims = new();
 
-            string? apiKey = _configuration["Inz:ServiceApiKey"];
-
-            SymmetricSecurityKey key;
-            SigningCredentials credentials;
-            JwtSecurityToken jwtSecurityToken;
-            string jwtHandler;
+            string signingKey = _configuration.GetSection("Token")["ServiceApiKey"]!;
+            string audience = _configuration.GetSection("Token")["Audience"]!;
+            string issuer = _configuration.GetSection("Token")["Issuer"]!;
             
             if (loginDTO.PersonType == PersonType.Doctor)
             {
@@ -77,22 +75,23 @@ namespace Inz.Services
                 claims.Add(new Claim(ClaimTypes.Role, "Patient"));
             }
 
-            if (apiKey == null)
+            if (signingKey == null || audience == null || issuer == null)
             {
                 return null;
             }
 
-            key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(apiKey));
-            credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(signingKey));
+            SigningCredentials credentials = new(key, SecurityAlgorithms.HmacSha256Signature);
 
-            jwtSecurityToken = new JwtSecurityToken(
-                issuer: loginDTO.Login,
+            JwtSecurityToken jwtSecurityToken = new(
+                issuer: issuer,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(30),
+                audience: audience,
+                expires: DateTime.UtcNow.AddHours(10),
                 signingCredentials: credentials
             );
 
-            jwtHandler = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+            string jwtHandler = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
 
             return jwtHandler;
         }
