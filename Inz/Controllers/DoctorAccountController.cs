@@ -7,6 +7,7 @@ namespace Inz.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Doctor")]
     public class DoctorAccountController : ControllerBase, IDoctorAccountController
     {
         private readonly IDoctorService _doctorService;
@@ -18,24 +19,8 @@ namespace Inz.Controllers
             _logger = logger;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> InsertDoctorAsync(DoctorDTO doctorDTO)
-        {
-            _logger.LogInformation($"Calling {nameof(InsertDoctorAsync)}");
-
-            var callback = await _doctorService.InsertDoctorAsync(doctorDTO);
-
-            IActionResult actionResult = callback.Match(
-                doctor => Ok(doctor.ResponseMessage),
-                conflict => Conflict(conflict.ResponseMessage),
-                databaseException => Problem($"{databaseException.Exception.Message}"));
-
-            return actionResult;
-        }
-
         [Route("Update")]
         [HttpPut]
-        [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO)
         {
             _logger.LogInformation($"Calling {nameof(UpdateDoctorAsync)}");

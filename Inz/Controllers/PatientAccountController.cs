@@ -1,11 +1,13 @@
 ﻿using Inz.DTOModel;
 using Inz.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Inz.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Patient")]
     public class PatientAccountController : ControllerBase, IPatientAccountController
     {
         private readonly IPatientService _patientService;
@@ -15,22 +17,6 @@ namespace Inz.Controllers
         {
             _patientService = patientService;
             _logger = logger;
-        }
-
-        [Route("AddPatient")]
-        [HttpPost]
-        public async Task<IActionResult> InsertPatientAsync(PatientDTO patientDTO)
-        {
-            _logger.LogInformation(message: $"Calling: {nameof(InsertPatientAsync)}");
-
-            var callback = await _patientService.InsertPatientAsync(patientDTO);
-
-            IActionResult actionResult = callback.Match(
-                okResponse => Ok(okResponse.ResponseMessage),
-                conflict => Conflict(conflict.ResponseMessage),
-                databaseException => Problem($"{databaseException}"));
-
-            return actionResult;
         }
 
         [Route("Update")]

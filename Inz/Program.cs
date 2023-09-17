@@ -89,7 +89,7 @@ if (signingKey != null && audience != null && issuer != null)
 }
 else
 {
-    throw new Exception("Startup of the program has failed - there's a missing Authentication builder, please check your json configuration");
+    throw new Exception("Startup of the program has failed - there's a missing Authentication builder, please check json's configuration");
 }
 
 builder.Services.AddAuthorization();

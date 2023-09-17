@@ -81,13 +81,13 @@ namespace Inz.Services
             }
 
             SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(signingKey));
-            SigningCredentials credentials = new(key, SecurityAlgorithms.HmacSha256Signature);
+            SigningCredentials credentials = new(key, SecurityAlgorithms.HmacSha512Signature);
 
             JwtSecurityToken jwtSecurityToken = new(
                 issuer: issuer,
                 claims: claims,
                 audience: audience,
-                expires: DateTime.UtcNow.AddHours(10),
+                expires: DateTime.UtcNow.AddMinutes(30),
                 signingCredentials: credentials
             );
 
