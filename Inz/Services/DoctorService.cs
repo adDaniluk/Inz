@@ -3,6 +3,7 @@ using Inz.Model;
 using Inz.OneOfHelper;
 using Inz.Repository;
 using OneOf;
+using System.Data.Common;
 
 namespace Inz.Services
 {
@@ -96,10 +97,18 @@ namespace Inz.Services
             OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse> responseHandler = new();
             string log;
 
-            var callbackDoctorToUpdate = await _doctorRepository.GetDoctorAsync(updateDoctorDTO.Id);
+            var callbackDoctorToUpdate = await _doctorRepository.GetDoctorByIdAsync(updateDoctorDTO.Id);
 
-            if (callbackDoctorToUpdate.TryPickT0(out Doctor doctorToUpdate, out var remainErrors))
+            if (callbackDoctorToUpdate.TryPickT0(out Doctor? doctorToUpdate, out var dbError))
             {
+                if(doctorToUpdate == null)
+                {
+                    log = $"Doctor with id {updateDoctorDTO.Id} does not exist.";
+                    _logger.LogError(message: log);
+                    responseHandler = new NotFoundResponse(log);
+                    return responseHandler;
+                }
+
                 if (updateDoctorDTO.MedicalSpecializationsId.Any())
                 {
                     var medicalSpecializationsToUpdate = await _medicalSpecializationRepository.GetMedicalSpecializationAsync(updateDoctorDTO.MedicalSpecializationsId.ToList());
@@ -134,8 +143,7 @@ namespace Inz.Services
 
                             if (curedDiseasesList.Any())
                             {
-
-                                doctorToUpdate.CuredDiseases = curedDiseasesList;
+                                doctorToUpdate.Diseases = curedDiseasesList;
                             }
                         },
                     dbException =>
@@ -162,70 +170,68 @@ namespace Inz.Services
 
                 var callbackUpdateDoctor = await _doctorRepository.UpdateDoctorAsync(doctorToUpdate);
 
-                if (callbackUpdateDoctor.TryPickT0(out OkResponse okResponse, out DatabaseExceptionResponse dbErrorResponse))
-                {
-                    log = $"Doctor with ID: {updateDoctorDTO.Id} has been updated";
-                    _logger.LogInformation(message: log);
-                    return new OkResponse(log);
-                }
-
-                return dbErrorResponse;
-            }
-
-            remainErrors.Switch(
-                    notFound =>
+                callbackUpdateDoctor.Switch(
+                    okResponse =>
                     {
-                        log = $"Doctor with id {updateDoctorDTO.Id} does not exist.";
-                        _logger.LogError(message: log);
-                        responseHandler = new NotFoundResponse(log);
+                        log = $"Doctor with ID: {updateDoctorDTO.Id} has been updated";
+                        _logger.LogInformation(message: log);
+                        responseHandler = new OkResponse(log);
                     },
-                    dbException =>
+                    dbErrorUpdateDoctor =>
                     {
-                        log = $"Database exception, please look into: {dbException.Exception}";
+                        log = $"Database exception, please look into: {dbError.Exception.Message}";
                         _logger.LogError(message: log);
+                        responseHandler = dbErrorUpdateDoctor;
                     });
 
-            return responseHandler;
+                return responseHandler;
+            }
+
+            log = $"Database exception, please look into: {dbError.Exception.Message}";
+            _logger.LogError(message: log);
+            return dbError;
         }
 
         public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> AddDoctorServiceAsync(DoctorServiceDTO serviceDoctorDTO)
         {
-
             string log;
 
-            var callbackDoctor = _doctorRepository.GetDoctorAsync(serviceDoctorDTO.DoctorId);
-            var callbackService = _serviceRepository.GetServiceAsync(serviceDoctorDTO.ServiceId);
-            var callbackDoctorService = _doctorServiceRepository.GetDoctorServiceAsync(serviceDoctorDTO.DoctorId, serviceDoctorDTO.ServiceId);
+            var callbackDoctor = await _doctorRepository.GetDoctorByIdAsync(serviceDoctorDTO.DoctorId);
+            var callbackService = await _serviceRepository.GetServiceAsync(serviceDoctorDTO.ServiceId);
+            var callbackDoctorService = await _doctorServiceRepository.GetDoctorServiceAsync(serviceDoctorDTO.DoctorId, serviceDoctorDTO.ServiceId);
 
-            Task.WaitAll(callbackDoctor, callbackService, callbackDoctorService);
+            //await Task.WhenAll(callbackDoctor, callbackService, callbackDoctorService);
 
-            if(callbackDoctor.Result.IsT2 || callbackService.Result.IsT2 || callbackDoctorService.Result.IsT2)
+            callbackDoctor.TryPickT0(out var doctor, out var dbErrorDoctor);
+            callbackService.TryPickT0(out var service, out var dbErrorService);
+            callbackDoctorService.TryPickT0(out var doctorServices, out var dbErrorDoctorService);
+
+            if(dbErrorDoctor != null || dbErrorService != null || dbErrorDoctorService != null)
             {
-                DatabaseExceptionResponse dbException;
-                dbException = callbackDoctor.Result.IsT2 ? callbackDoctor.Result.AsT2 : (callbackService.Result.IsT2 ? callbackService.Result.AsT2 : callbackDoctorService.Result.AsT2);
-                log = $"Database exception, please look into: {dbException.Exception}";
+                DatabaseExceptionResponse dbException = dbErrorDoctor != null ? dbErrorDoctor : (dbErrorService != null ? dbErrorService : dbErrorDoctorService);
+                log = $"Database exception, please look into: {dbException.Exception.Message}";
                 _logger.LogError(message: log);
                 return dbException;
             }
 
-            if(callbackDoctor.Result.IsT1 || callbackService.Result.IsT1 || callbackDoctorService.Result.IsT0)
+            if (doctor == null)
             {
-                if (callbackDoctor.Result.IsT1)
-                {
-                    log = $"Doctor with id {serviceDoctorDTO.DoctorId} does not exist";
-                    _logger.LogInformation(message: log);
-                }
-                else if(callbackService.Result.IsT1)
-                {
-                    log = $"Service with id {serviceDoctorDTO.ServiceId} does not exist";
-                    _logger.LogInformation(message: log);
-                }
-                else
-                {
-                    log = $"DoctorService with service id: {serviceDoctorDTO.ServiceId} and doctor id: {serviceDoctorDTO.DoctorId} already exist.";
-                    _logger.LogInformation(message: log);
-                }
+                log = $"Doctor with id {serviceDoctorDTO.DoctorId} does not exist";
+                _logger.LogInformation(message: log);
+                return new NotFoundResponse(log);
+            }
 
+            if(service == null)
+            {
+                log = $"Service with id {serviceDoctorDTO.ServiceId} does not exist";
+                _logger.LogInformation(message: log);
+                return new NotFoundResponse(log);
+            }
+
+            if(doctorServices != null)
+            {
+                log = $"DoctorService with service id: {serviceDoctorDTO.ServiceId} and doctor id: {serviceDoctorDTO.DoctorId} already exist.";
+                _logger.LogInformation(message: log);
                 return new NotFoundResponse(log);
             }
 
@@ -238,14 +244,17 @@ namespace Inz.Services
 
             var callbackAddDoctorService = await _doctorServiceRepository.AddDoctorServiceAsync(doctorService);
 
-            if(callbackAddDoctorService.IsT0)
+            if(callbackAddDoctorService.TryPickT0(out var okResponse, out var dbErrorAddDoctorService))
             {
                 log = $"DoctorService has been added";
                 _logger.LogInformation(message: log);
-                return new OkResponse(log);
+                okResponse.ResponseMessage = log;
+                return okResponse;
             }
 
-            return new DatabaseExceptionResponse(callbackAddDoctorService.AsT1.Exception);
+            log = $"Database exception, please look into: {dbErrorAddDoctorService.Exception.Message}";
+            _logger.LogError(message: log);
+            return dbErrorAddDoctorService;
         }
 
         public async Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> RemoveDoctorServiceAsync(RemoveDoctorServiceDTO removeDoctorServiceDTO)
@@ -254,7 +263,9 @@ namespace Inz.Services
 
             var callbackDoctorService = await _doctorServiceRepository.GetDoctorServiceAsync(removeDoctorServiceDTO.DoctorId, removeDoctorServiceDTO.ServiceId);
 
-            if(callbackDoctorService.TryPickT0(out DoctorServices doctorServices, out var remainderErrors))
+            callbackDoctorService.TryPickT0(out var doctorServices, out var remainderErrors);
+            
+            if(doctorServices != null)
             {
                 DoctorServices doctorServiceToRemove = doctorServices;
 
@@ -268,23 +279,24 @@ namespace Inz.Services
                     return okResponse;
                 }
 
-                log = $"Database exception, please look into: {dbError.Exception}";
+                log = $"Database exception, please look into: {dbError.Exception.Message}";
                 _logger.LogError(message: log);
                 return dbError;
             }
 
-            if (remainderErrors.IsT0)
-            {
-                log = $"DoctorService does not exist.";
-                _logger.LogInformation(message: log);
-                return new NotFoundResponse(log);
-            }
-            else
-            {
-                log = $"Database exception, please look into: {remainderErrors.AsT1.Exception}";
-                _logger.LogError(message: log);
-                return remainderErrors.AsT1;
-            }
+            return remainderErrors;
+            //if (remainderErrors.IsT0)
+            //{
+            //    log = $"DoctorService does not exist.";
+            //    _logger.LogInformation(message: log);
+            //    return new NotFoundResponse(log);
+            //}
+            //else
+            //{
+            //    log = $"Database exception, please look into: {remainderErrors.AsT1.Exception.Message}";
+            //    _logger.LogError(message: log);
+            //    return remainderErrors.AsT1;
+            //}
         }
 
         //Generic validation method -> as a sample

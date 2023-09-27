@@ -131,6 +131,7 @@ namespace Inz.Migrations
                     LicenseNumber = table.Column<int>(type: "int", nullable: false),
                     Biography = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AddressId = table.Column<int>(type: "int", nullable: false),
+                    PersonType = table.Column<int>(type: "int", nullable: false),
                     Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
                     AlterTimestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DeleteTimestamp = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -162,6 +163,7 @@ namespace Inz.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AddressId = table.Column<int>(type: "int", nullable: false),
+                    PersonType = table.Column<int>(type: "int", nullable: false),
                     Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
                     AlterTimestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DeleteTimestamp = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -190,15 +192,15 @@ namespace Inz.Migrations
                 name: "DoctorCuredDiseases",
                 columns: table => new
                 {
-                    CuredDiseasesId = table.Column<int>(type: "int", nullable: false),
+                    DiseasesId = table.Column<int>(type: "int", nullable: false),
                     DoctorsId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DoctorCuredDiseases", x => new { x.CuredDiseasesId, x.DoctorsId });
+                    table.PrimaryKey("PK_DoctorCuredDiseases", x => new { x.DiseasesId, x.DoctorsId });
                     table.ForeignKey(
-                        name: "FK_DoctorCuredDiseases_Diseases_CuredDiseasesId",
-                        column: x => x.CuredDiseasesId,
+                        name: "FK_DoctorCuredDiseases_Diseases_DiseasesId",
+                        column: x => x.DiseasesId,
                         principalTable: "Diseases",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);

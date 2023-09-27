@@ -10,14 +10,16 @@ namespace Inz.Controllers
     public class RegisterController : ControllerBase, IRegisterControler 
     {
         private readonly DbContextApi _dbContextApi;
-        private readonly ILogger _logger;
-        private readonly PatientService _patientService;
-        private readonly DoctorService _doctorService;
+        private readonly ILogger<RegisterController> _logger;
+        private readonly IPatientService _patientService;
+        private readonly IDoctorService _doctorService;
+
+        public const string dbErrorInformation = "Cannot connect to the database, please contact Admin@admin.admin. See inner exception:";
 
         public RegisterController(DbContextApi dbContextApi,
-            DoctorService doctorService,
-            PatientService patientService,
-            ILogger logger)
+            IDoctorService doctorService,
+            IPatientService patientService,
+            ILogger<RegisterController> logger)
         {
             _dbContextApi = dbContextApi;
             _doctorService = doctorService;
@@ -29,14 +31,14 @@ namespace Inz.Controllers
         [HttpPost]
         public async Task<IActionResult> DoctorRegisterAsync(DoctorDTO doctorDTO)
         {
-            _logger.LogInformation($"Calling {nameof(DoctorRegisterAsync)}");
+            _logger.LogInformation(message: $"Calling {nameof(DoctorRegisterAsync)}");
 
             var callback = await _doctorService.InsertDoctorAsync(doctorDTO);
 
             IActionResult actionResult = callback.Match(
                 doctor => Ok(doctor.ResponseMessage),
                 conflict => Conflict(conflict.ResponseMessage),
-                databaseException => Problem($"{databaseException.Exception.Message}"));
+                databaseException => Problem($"{dbErrorInformation}: {databaseException.Exception.Message}"));
 
             return actionResult;
         }
@@ -52,7 +54,7 @@ namespace Inz.Controllers
             IActionResult actionResult = callback.Match(
                 okResponse => Ok(okResponse.ResponseMessage),
                 conflict => Conflict(conflict.ResponseMessage),
-                databaseException => Problem($"{databaseException}"));
+                databaseException => Problem($"{dbErrorInformation}: {databaseException.Exception.Message}"));
 
             return actionResult;
         }

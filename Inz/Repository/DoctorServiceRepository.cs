@@ -14,13 +14,13 @@ namespace Inz.Repository
             _dbContextApi = dbContextApi;
         }
 
-        public async Task<OneOf<DoctorServices, NotFoundResponse, DatabaseExceptionResponse>> GetDoctorServiceAsync(int doctorId, int serviceId)
+        public async Task<OneOf<DoctorServices?, DatabaseExceptionResponse>> GetDoctorServiceAsync(int doctorId, int serviceId)
         {
             try
             {
                 DoctorServices? doctorServices = await _dbContextApi.DoctorServices.SingleOrDefaultAsync(x => x.DoctorId == doctorId && x.ServiceId == serviceId);
 
-                return doctorServices != null ? doctorServices : new NotFoundResponse();
+                return doctorServices;
             }
             catch (Exception exception)
             {
@@ -42,15 +42,11 @@ namespace Inz.Repository
             }
         }
 
-        public async Task<OneOf<IList<DoctorServices>, NotFoundResponse, DatabaseExceptionResponse>> GetDoctorServiceByDoctorIdAsync(int id)
+        public async Task<OneOf<IList<DoctorServices>, DatabaseExceptionResponse>> GetDoctorServiceByDoctorIdAsync(int doctorId)
         {
             try
             {
-                var doctorServicesList = await _dbContextApi.DoctorServices.Where(x => x.DoctorId == id).ToListAsync();
-                if(doctorServicesList.Count == 0)
-                {
-                    return new NotFoundResponse();
-                }
+                List<DoctorServices> doctorServicesList = await _dbContextApi.DoctorServices.Where(x => x.DoctorId == doctorId).ToListAsync();
                 return doctorServicesList;
             }
             catch (Exception exception)

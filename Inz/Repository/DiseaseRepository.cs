@@ -15,7 +15,7 @@ namespace Inz.Repository
             _contextApi = dbContextApi;
         }
 
-        public async Task<OneOf<List<Disease>, DatabaseExceptionResponse>> GetDiseaseAsync(List<int> ids)
+        public async Task<OneOf<IList<Disease>, DatabaseExceptionResponse>> GetDiseaseAsync(List<int> ids)
         {
             try
             {

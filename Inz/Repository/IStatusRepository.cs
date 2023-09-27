@@ -6,6 +6,6 @@ namespace Inz.Repository
 {
     public interface IStatusRepository
     {
-        public Task<OneOf<Status, NotFoundResponse, DatabaseExceptionResponse>> GetStatus(StatusEnum statusEnum);
+        public Task<OneOf<Status?, DatabaseExceptionResponse>> GetStatusAsync(StatusEnum statusEnum);
     }
 }

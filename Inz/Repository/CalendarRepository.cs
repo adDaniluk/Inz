@@ -19,7 +19,7 @@ namespace Inz.Repository
 
         }
 
-        public async Task<OneOf<OkResponse, DatabaseExceptionResponse>> InsertCalendar(List<Calendar> calendars)
+        public async Task<OneOf<OkResponse, DatabaseExceptionResponse>> InsertCalendarAsync(List<Calendar> calendars)
         {
             try
             { 
@@ -27,25 +27,25 @@ namespace Inz.Repository
                 await _dbContextApi.SaveChangesAsync();
                 return new OkResponse();
             }
-            catch (Exception exception) {
-                _logger.LogError(message: $"{exception.Message}");
+            catch (Exception exception)
+            {
                 return new DatabaseExceptionResponse(exception);
             }
         }
 
-        public async Task<OneOf<Calendar, NotFoundResponse, DatabaseExceptionResponse>> GetCalendar(int id)
+        public async Task<OneOf<Calendar?, DatabaseExceptionResponse>> GetCalendarAsync(int id)
         {
             try
             {
                 Calendar? calendar = await _dbContextApi.Calendars.
-                    Where(x => x.Id == id && x.IsDeleted == 0).
                     Include(x => x.Doctor).
                     Include(x => x.Status).
                     Include(x => x.Doctor).
                     Include(x => x.DoctorVisit).
-                    SingleOrDefaultAsync();
+                    Include(x => x.Patient).
+                    SingleOrDefaultAsync(x => x.Id == id && x.IsDeleted == 0);
 
-                return calendar != null ? calendar : new NotFoundResponse();
+                return calendar;
             }
             catch(Exception exception)
             {
@@ -53,7 +53,7 @@ namespace Inz.Repository
             }
         }
 
-        public async Task<OneOf<List<Calendar>, DatabaseExceptionResponse>> GetCalendarsByDoctorId(int doctorId)
+        public async Task<OneOf<List<Calendar>, DatabaseExceptionResponse>> GetCalendarsByDoctorIdAsync(int doctorId)
         {
             try
             {
@@ -78,6 +78,20 @@ namespace Inz.Repository
                     .ToListAsync();
 
                 return calendars;
+            }
+            catch(Exception exception)
+            {
+                return new DatabaseExceptionResponse(exception);
+            }
+        }
+
+        public async Task<OneOf<OkResponse, DatabaseExceptionResponse>> UpdateCalendarAsync(Calendar calendar)
+        {
+            try
+            {
+                _dbContextApi.Calendars.Update(calendar);
+                await _dbContextApi.SaveChangesAsync();
+                return new OkResponse();
             }
             catch(Exception exception)
             {

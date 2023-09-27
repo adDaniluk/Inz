@@ -13,6 +13,8 @@ namespace Inz.Controllers
         private readonly IDoctorService _doctorService;
         private readonly ILogger _logger;
 
+        public const string dbErrorInformation = "Cannot connect to the database, please contact Admin@admin.admin. See inner exception:";
+
         public DoctorAccountController(IDoctorService doctorService, ILogger<IDoctorAccountController> logger)
         {
             _doctorService = doctorService;
@@ -23,14 +25,14 @@ namespace Inz.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO)
         {
-            _logger.LogInformation($"Calling {nameof(UpdateDoctorAsync)}");
+            _logger.LogInformation(message: $"Calling {nameof(UpdateDoctorAsync)}");
 
             var callback = await _doctorService.UpdateDoctorAsync(updateDoctorDTO);
 
             IActionResult actionResult = callback.Match(
                 okResult => Ok(okResult.ResponseMessage),
                 notFound => NotFound(notFound.ResponseMessage),
-                databaseException => Problem($"{databaseException.Exception.Message}"));
+                databaseException => Problem($"{dbErrorInformation}: {databaseException.Exception.Message}"));
 
             return actionResult;
         }
@@ -46,8 +48,7 @@ namespace Inz.Controllers
             IActionResult actionResult = callback.Match(
                 doctorServices => Ok(doctorServices.ResponseMessage),
                 notFound => NotFound(notFound.ResponseMessage),
-                databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
-                    $"See inner exception: {databaseException.Exception.Message}"));
+                databaseException => Problem($"{dbErrorInformation}: {databaseException.Exception.Message}"));
 
             return actionResult;
         }
@@ -63,8 +64,7 @@ namespace Inz.Controllers
             IActionResult actionResult = callback.Match(
                 doctorServices => Ok(doctorServices.ResponseMessage),
                 notFound => NotFound(notFound.ResponseMessage),
-                databaseException => Problem("Cannot connect to the database, please contact Admin@admin.admin | " +
-                    $"See inner exception: {databaseException.Exception.Message}"));
+                databaseException => Problem($"{dbErrorInformation}: {databaseException.Exception.Message}"));
 
             return actionResult;
         }

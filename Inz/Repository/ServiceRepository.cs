@@ -15,13 +15,12 @@ namespace Inz.Repository
             _dbContextApi = dbContextApi;
         }
 
-        public async Task<OneOf<Service, NotFoundResponse, DatabaseExceptionResponse>> GetServiceAsync(int id)
+        public async Task<OneOf<Service?, DatabaseExceptionResponse>> GetServiceAsync(int id)
         {
             try
             {
                 Service? service = await _dbContextApi.Services.SingleOrDefaultAsync(x => x.Id == id);
-
-                return service != null ? service : new NotFoundResponse();
+                return service;
             }
             catch (Exception exception)
             {

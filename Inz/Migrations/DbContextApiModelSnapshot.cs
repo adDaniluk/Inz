@@ -17,20 +17,20 @@ namespace Inz.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.8")
+                .HasAnnotation("ProductVersion", "7.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("DoctorCuredDiseases", b =>
                 {
-                    b.Property<int>("CuredDiseasesId")
+                    b.Property<int>("DiseasesId")
                         .HasColumnType("int");
 
                     b.Property<int>("DoctorsId")
                         .HasColumnType("int");
 
-                    b.HasKey("CuredDiseasesId", "DoctorsId");
+                    b.HasKey("DiseasesId", "DoctorsId");
 
                     b.HasIndex("DoctorsId");
 
@@ -221,6 +221,9 @@ namespace Inz.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int>("PersonType")
+                        .HasColumnType("int");
+
                     b.Property<int>("Phone")
                         .HasColumnType("int");
 
@@ -385,6 +388,9 @@ namespace Inz.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("PersonType")
+                        .HasColumnType("int");
 
                     b.Property<int>("Phone")
                         .HasColumnType("int");
@@ -571,7 +577,7 @@ namespace Inz.Migrations
                 {
                     b.HasOne("Inz.Model.Disease", null)
                         .WithMany()
-                        .HasForeignKey("CuredDiseasesId")
+                        .HasForeignKey("DiseasesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

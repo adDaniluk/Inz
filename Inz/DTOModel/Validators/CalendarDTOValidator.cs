@@ -10,7 +10,7 @@ namespace Inz.DTOModel.Validators
 
             RuleFor(c => c.DoctorId).NotEmpty().NotNull().GreaterThan(0);
             RuleFor(c => c.TimeBlockIds).NotEmpty().NotNull().ForEach(x => x.InclusiveBetween(1,5));
-            RuleFor(c => c.Date).NotEmpty().NotNull().GreaterThan(DateTime.Now.Date.AddDays(-1));
+            RuleFor(c => c.Date).NotEmpty().NotNull().GreaterThanOrEqualTo(DateTime.Now.Date.AddDays(1));
         }
     }
 }

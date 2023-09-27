@@ -11,7 +11,9 @@ namespace Inz.Controllers
     {
         private readonly ILoginService _loginService;
         private readonly ILogger _logger;
-        
+
+        public const string dbErrorInformation = "Cannot connect to the database, please contact Admin@admin.admin. See inner exception:";
+
         public LoginController(ILoginService loginService, ILogger<LoginController> logger)
         {
             _loginService = loginService;
@@ -28,8 +30,7 @@ namespace Inz.Controllers
             IActionResult response =  callback.Match(
                 okResponse => Ok(okResponse.ResponseMessage),
                 notAutorizedResponse => Ok(notAutorizedResponse.ReponseMessage),
-                databaseException => Problem(databaseException.Exception.Message)
-                );
+                databaseException => Problem($"{dbErrorInformation}: {databaseException.Exception.Message}"));
 
             return response;
         }

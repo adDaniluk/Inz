@@ -36,13 +36,14 @@ namespace Inz.Repository
                 _dbContextApi.Doctors.Update(doctor);
                 await _dbContextApi.SaveChangesAsync();
                 return new OkResponse();
-            }catch(Exception exception)
+            }
+            catch(Exception exception)
             {
                 return new DatabaseExceptionResponse(exception);
             }
         }
 
-        public async Task<OneOf<Doctor, NotFoundResponse, DatabaseExceptionResponse>> GetDoctorAsync(int id)
+        public async Task<OneOf<Doctor?, DatabaseExceptionResponse>> GetDoctorByIdAsync(int id)
         {
             try
             {
@@ -50,9 +51,10 @@ namespace Inz.Repository
                     .Include(x => x.Address)
                     .Include(x => x.MedicalSpecializations)
                     .Include(x => x.DoctorServices)
+                    .Include(x => x.Diseases)
                     .SingleOrDefaultAsync(x => x.Id == id && x.IsDeleted == 0);
 
-                return doctor != null ? doctor : new NotFoundResponse();
+                return doctor;
             }
             catch(Exception exception)
             {

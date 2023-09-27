@@ -6,6 +6,6 @@ namespace Inz.Repository
 {
     public interface IDiseaseRepository
     {
-        public Task<OneOf<List<Disease>, DatabaseExceptionResponse>> GetDiseaseAsync(List<int> ids);
+        public Task<OneOf<IList<Disease>, DatabaseExceptionResponse>> GetDiseaseAsync(List<int> ids);
     }
 }

@@ -39,7 +39,7 @@ namespace Inz.Context
                 .UsingEntity("DoctorMedicalSpecialization");
 
             modelBuilder.Entity<Doctor>()
-                 .HasMany(d => d.CuredDiseases)
+                 .HasMany(d => d.Diseases)
                  .WithMany(d => d.Doctors)
                  .UsingEntity("DoctorCuredDiseases");
 

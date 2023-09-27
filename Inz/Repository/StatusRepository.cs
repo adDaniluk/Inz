@@ -15,12 +15,12 @@ namespace Inz.Repository
             _dbContextApi = dbContextApi;
         }
 
-        public async Task<OneOf<Status, NotFoundResponse, DatabaseExceptionResponse>> GetStatus(StatusEnum statusEnum)
+        public async Task<OneOf<Status?, DatabaseExceptionResponse>> GetStatusAsync(StatusEnum statusEnum)
         {
             try
             {
-                Status? status = await _dbContextApi.Statuses.SingleOrDefaultAsync(x => x.CalendarStatus.Equals(statusEnum));
-                return status != null ? status : new NotFoundResponse();
+                Status? status = await _dbContextApi.Statuses.SingleOrDefaultAsync(x => x.CalendarStatus == statusEnum);
+                return status;
             }
             catch(Exception exception)
             {

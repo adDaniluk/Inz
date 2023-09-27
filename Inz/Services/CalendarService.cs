@@ -32,15 +32,17 @@ namespace Inz.Services
             string log;
             OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse> responseHandler = new ();
 
-            var callbackDoctor = await _doctorRepository.GetDoctorAsync(calendarDTO.DoctorId);
+            var callbackDoctor = await _doctorRepository.GetDoctorByIdAsync(calendarDTO.DoctorId);
 
             callbackDoctor.Switch(
-                callbackDoctor => { },
-                notFound =>
+                callbackDoctor =>
                 {
-                    log = $"Doctor with id {calendarDTO.DoctorId} does not exist.";
-                    _logger.LogInformation(message: log);
-                    responseHandler = new NotFoundResponse(log);
+                    if (callbackDoctor == null)
+                    {
+                        log = $"Doctor with id {calendarDTO.DoctorId} does not exist.";
+                        _logger.LogInformation(message: log);
+                        responseHandler = new NotFoundResponse(log);
+                    }
                 },
                 dbException =>
                 {
@@ -54,7 +56,7 @@ namespace Inz.Services
                 return responseHandler;
             }
 
-            var callbackDoctorsCalendar = await _calendarRepository.GetCalendarsByDoctorId(calendarDTO.DoctorId);
+            var callbackDoctorsCalendar = await _calendarRepository.GetCalendarsByDoctorIdAsync(calendarDTO.DoctorId);
 
             if (callbackDoctorsCalendar.TryPickT0(out var calendars, out var dbException))
             {
@@ -67,27 +69,30 @@ namespace Inz.Services
                 }
 
 
-                var callbackGetStatus = await _statusRepository.GetStatus(StatusEnum.Open);
+                var callbackGetStatus = await _statusRepository.GetStatusAsync(StatusEnum.Open);
                 List<Calendar> calendarsList = new List<Calendar>();
 
                 callbackGetStatus.Switch(
                     status =>
                     {
-                        calendarsList = calendarDTO.TimeBlockIds.Select(id => new Calendar
+                        if (status != null)
                         {
-                            Date = calendarDTO.Date,
-                            DoctorId = calendarDTO.DoctorId,
-                            TimeBlockId = id,
-                            Timestamp = DateTime.Now,
-                            AlterTimestamp = DateTime.Now,
-                            StatusId = status.Id
-                        }).ToList();
-                    },
-                    notFound =>
-                    {
-                        log = $"'Open' status does not exist -> missing statues in database.";
-                        _logger.LogInformation(message: log);
-                        responseHandler = new NotFoundResponse(log);
+                            calendarsList = calendarDTO.TimeBlockIds.Select(id => new Calendar
+                            {
+                                Date = calendarDTO.Date,
+                                DoctorId = calendarDTO.DoctorId,
+                                TimeBlockId = id,
+                                Timestamp = DateTime.Now,
+                                AlterTimestamp = DateTime.Now,
+                                StatusId = status.Id
+                            }).ToList();
+                        }
+                        else
+                        {
+                            log = $"'Open' status does not exist -> missing statuses in database.";
+                            _logger.LogInformation(message: log);
+                            responseHandler = new NotFoundResponse(log);
+                        }
                     },
                     dbException =>
                     {
@@ -100,7 +105,7 @@ namespace Inz.Services
                 if (callbackGetStatus.IsT0 && calendarsList.Any())
                 {
 
-                    var callbackInsertCalendar = await _calendarRepository.InsertCalendar(calendarsList);
+                    var callbackInsertCalendar = await _calendarRepository.InsertCalendarAsync(calendarsList);
 
                     callbackInsertCalendar.Switch(
                         okResponse => {
@@ -124,16 +129,22 @@ namespace Inz.Services
             OneOf<Calendar, NotFoundResponse, DatabaseExceptionResponse> responseHandler = new ();
             string log;
 
-            var callbackGetCalendar = await _calendarRepository.GetCalendar(id);
+            var callbackGetCalendar = await _calendarRepository.GetCalendarAsync(id);
 
             callbackGetCalendar.Switch
-                (okResponse => responseHandler = okResponse,
-                notFound => {
-                    log = $"Calendar with Id:{id} does not exist.";
-                    _logger.LogInformation(message: log);
-                    responseHandler = new NotFoundResponse(log);
-                },
-                databaseException => {
+                (okResponse =>
+                    {
+                        if (okResponse != null)
+                        {
+                            responseHandler = okResponse;
+                        }
+
+                        log = $"Calendar with Id:{id} does not exist.";
+                        _logger.LogInformation(message: log);
+                        responseHandler = new NotFoundResponse(log);
+                    },
+                databaseException =>
+                {
                     log = $"Error on a database, see inner exception: {databaseException.Exception.Message}";
                     _logger.LogError(message: log);
                     responseHandler = databaseException;

@@ -13,6 +13,8 @@ namespace Inz.Controllers
         private readonly IPatientService _patientService;
         private readonly ILogger _logger;
 
+        public const string dbErrorInformation = "Cannot connect to the database, please contact Admin@admin.admin. See inner exception:";
+
         public PatientAccountController(IPatientService patientService, ILogger<PatientAccountController> logger)
         {
             _patientService = patientService;
@@ -30,7 +32,7 @@ namespace Inz.Controllers
             IActionResult actionResult = callback.Match(
                 patient => Ok(patient.ResponseMessage),
                 notFound => NotFound(notFound.ResponseMessage),
-                databaseException => Problem($"{databaseException}"));
+                databaseException => Problem($"{dbErrorInformation}: {databaseException.Exception.Message}"));
 
             return actionResult;
         }
