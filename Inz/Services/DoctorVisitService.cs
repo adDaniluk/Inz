@@ -3,7 +3,6 @@ using Inz.Model;
 using Inz.OneOfHelper;
 using Inz.Repository;
 using OneOf;
-using System.Globalization;
 
 namespace Inz.Services
 {
@@ -38,7 +37,6 @@ namespace Inz.Services
 
             var callbackCalendar = await _calendarRepository.GetCalendarAsync(calendarId);
 
-
             if (callbackCalendar.TryPickT1(out var dbErrorCalendar, out var calendarToUpdate))
             {
                 log = $"Error on a database, see inner exception: {dbErrorCalendar.Exception.Message}";
@@ -50,6 +48,29 @@ namespace Inz.Services
             {
                 log = $"Calendar with {doctorVisitDTO.CalendarId} does not exist.";
                 _logger.LogError(message: log);
+                return new NotFoundResponse(log);
+            }
+
+            var callbackStatusOpen = await _statusRepository.GetStatusAsync(StatusEnum.Open);
+
+            if (callbackStatusOpen.TryPickT1(out var dbErrorStatusCheckOpen, out var statusOpen))
+            {
+                log = $"Error on a database, see inner exception: {dbErrorStatusCheckOpen.Exception.Message}";
+                _logger.LogError(message: log);
+                return dbErrorStatusCheckOpen;
+            }
+
+            if (statusOpen == null)
+            {
+                log = $"Status does not exist.";
+                _logger.LogError(message: log);
+                return new NotFoundResponse(log);
+            }
+
+            if(calendarToUpdate.Status != statusOpen)
+            {
+                log = $"The calendar is already booked.";
+                _logger.LogInformation(message: log);
                 return new NotFoundResponse(log);
             }
 
@@ -69,16 +90,16 @@ namespace Inz.Services
                 return new NotFoundResponse(log);
             }
 
-            var callbackStatus = await _statusRepository.GetStatusAsync(StatusEnum.Reserved);
+            var callbackStatusReserved = await _statusRepository.GetStatusAsync(StatusEnum.Reserved);
 
-            if(callbackStatus.TryPickT1(out var dbErrorStatusCheck, out var status))
+            if(callbackStatusReserved.TryPickT1(out var dbErrorStatusCheckReserved, out var statusReserved))
             {
-                log = $"Error on a database, see inner exception: {dbErrorStatusCheck.Exception.Message}";
+                log = $"Error on a database, see inner exception: {dbErrorStatusCheckReserved.Exception.Message}";
                 _logger.LogError(message: log);
-                return dbErrorStatusCheck;
+                return dbErrorStatusCheckReserved;
             }
 
-            if(status == null)
+            if(statusReserved == null)
             {
                 log = $"Status does not exist.";
                 _logger.LogError(message: log);
@@ -93,7 +114,7 @@ namespace Inz.Services
             calendarToUpdate.AlterTimestamp = DateTime.Now;
             calendarToUpdate.PatientId = patientId;
             calendarToUpdate.ServicePrice = doctorService.Price;
-            calendarToUpdate.Status = status;
+            calendarToUpdate.Status = statusReserved;
 
             var callbackCreateDoctorVisit = await _doctorVisitRepository.CreateDoctorVisitAsync(doctorVisit);
 

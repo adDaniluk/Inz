@@ -10,12 +10,10 @@ namespace Inz.Repository
     {
 
         private readonly DbContextApi _dbContextApi;
-        private readonly ILogger _logger;
 
-        public CalendarRepository(DbContextApi dbContextApi, ILogger<ICalendarRepository> logger)
+        public CalendarRepository(DbContextApi dbContextApi)
         {
             _dbContextApi = dbContextApi;
-            _logger = logger;
 
         }
 
