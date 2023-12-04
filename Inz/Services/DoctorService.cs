@@ -3,7 +3,6 @@ using Inz.Model;
 using Inz.OneOfHelper;
 using Inz.Repository;
 using OneOf;
-using System.Data.Common;
 
 namespace Inz.Services
 {
@@ -68,6 +67,7 @@ namespace Inz.Services
                 DateOfBirth = doctorDTO.DateOfBirth,
                 Timestamp = DateTime.Now,
                 AlterTimestamp = DateTime.Now,
+                LicenseNumber = doctorDTO.LicenseNumber,
                 Address = new Address()
                 {
                     Street = doctorDTO.Street,

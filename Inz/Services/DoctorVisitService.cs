@@ -51,7 +51,7 @@ namespace Inz.Services
                 return new NotFoundResponse(log);
             }
 
-            var callbackStatusOpen = await _statusRepository.GetStatusAsync(StatusEnum.Open);
+            var callbackStatusOpen = await _statusRepository.GetStatusAsync(StatusEnum.Free);
 
             if (callbackStatusOpen.TryPickT1(out var dbErrorStatusCheckOpen, out var statusOpen))
             {

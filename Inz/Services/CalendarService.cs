@@ -69,7 +69,7 @@ namespace Inz.Services
                 }
 
 
-                var callbackGetStatus = await _statusRepository.GetStatusAsync(StatusEnum.Open);
+                var callbackGetStatus = await _statusRepository.GetStatusAsync(StatusEnum.Free);
                 List<Calendar> calendarsList = new List<Calendar>();
 
                 callbackGetStatus.Switch(
