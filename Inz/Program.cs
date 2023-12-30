@@ -2,31 +2,27 @@ using Inz.Context;
 using Inz.Repository;
 using Inz.Services;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 using FluentValidation.AspNetCore;
 using System.Reflection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddControllers();
 
-//TODO change require
-
-builder.Services.AddControllers().AddFluentValidation(opt =>
-{
-    opt.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-});
+builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<DbContextApi>(option => option.UseSqlServer(
-    builder.Configuration.GetSection("ConnectionDbStrings")["localhostExpress"]));
-
+builder.Configuration.GetSection("AzureSeverDB")["ConnectionString"]));
 //builder.Services.AddDbContext<DbContextApi>(option => option.UseSqlServer(builder.Configuration.GetSection("ConnectionDbStrings")["localhostExpress2"]), ServiceLifetime.Transient);
 
 builder.Services.AddScoped<IPatientService, PatientService>();
@@ -41,7 +37,6 @@ builder.Services.AddScoped<ICalendarRepository, CalendarRepository>();
 builder.Services.AddScoped<IDoctorVisitRepository, DoctorVisitRepository>();
 builder.Services.AddScoped<IDoctorVisitService, DoctorVisitService>();
 
-
 builder.Services.AddScoped<IDiseaseRepository, DiseaseRepository>();
 builder.Services.AddScoped<IMedicalSpecializationRepository, MedicalSpecializationRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
@@ -51,8 +46,8 @@ builder.Services.AddScoped<IStatusRepository, StatusRepository>();
 builder.Services.AddScoped<IPasswordHashService, PasswordHashService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 
-builder.Host.UseSerilog((ctx, lc)
-    => lc.ReadFrom.Configuration(ctx.Configuration));
+//builder.Host.UseSerilog((ctx, lc)
+//    => lc.ReadFrom.Configuration(ctx.Configuration));
 
 builder.Configuration.AddUserSecrets<Program>(true);
 
