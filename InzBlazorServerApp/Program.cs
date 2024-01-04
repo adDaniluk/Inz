@@ -1,6 +1,6 @@
+using Inz.Controllers;
+using InzBlazorServerApp;
 using InzBlazorServerApp.Data;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +8,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
+
+
+builder.Services.AddScoped<TypedHttpClient>();
+
+builder.Services.AddHttpClient<TypedHttpClient>(client =>
+    client.BaseAddress = new Uri("http://localhost:5012/"));
 
 var app = builder.Build();
 

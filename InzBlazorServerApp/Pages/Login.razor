@@ -1,0 +1,38 @@
+﻿@page "/Login"
+
+<PageTitle> Please log in</PageTitle>
+
+
+<div>
+    <div>
+        <label for="LoginUsername">LoginUsername:</label>
+        <input id="LoginUsername" @bind="LoginUsername" />
+
+        <label for="Password">Password:</label>
+        <input id="Password" type="Password" @bind="Password" />
+
+        <input type="checkbox" @bind="IsPatient" />
+        <label for="isChecked">Check if you are loggin as a Doctor</label>
+    </div>
+    
+    @if(IsLoading)
+    {
+        <div>
+            <p>
+                Loading...
+            </p>
+        </div>
+    }
+    else
+    {
+        <div>
+            <button @onclick="() => (GetToken(LoginUsername, Password, IsPatient))">Login</button>
+        </div>
+    }
+
+    @Token
+</div>
+ 
+@code {
+
+}
