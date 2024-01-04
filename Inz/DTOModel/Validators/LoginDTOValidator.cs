@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Inz.Model;
 
 namespace Inz.DTOModel.Validators
 {
@@ -10,7 +11,7 @@ namespace Inz.DTOModel.Validators
 
             RuleFor(p => p.Login).NotNull().NotEmpty().Length(5, 50);
             RuleFor(p => p.Password).NotNull().NotEmpty().Length(8, 100);
-            RuleFor(p => p.PersonType).NotNull().IsInEnum();
+            RuleFor(p => p.PersonType).NotNull().Must(x => x == PersonType.Doctor || x == PersonType.Patient).WithMessage("PersonType must be a doctor or a patient.");
         }
     }
 }
