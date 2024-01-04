@@ -26,7 +26,9 @@ namespace Inz.Controllers
         public async Task<IActionResult> UpdatePatientAsync(UpdatePatientDTO updatePatientDTO)
         {
             _logger.LogInformation(message: $"Calling {nameof(UpdatePatientAsync)}");
-            
+
+            updatePatientDTO.Id = Int16.Parse(User.Claims.Where(x => x.Type == "Id").First().Value);
+
             var callback = await _patientService.UpdatePatientAsyc(updatePatientDTO);
 
             IActionResult actionResult = callback.Match(

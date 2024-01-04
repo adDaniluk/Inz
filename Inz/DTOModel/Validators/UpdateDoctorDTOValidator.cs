@@ -8,7 +8,6 @@ namespace Inz.DTOModel.Validators
         {
             RuleLevelCascadeMode = CascadeMode.Stop;
 
-            RuleFor(p => p.Id).NotEmpty().NotNull();
             RuleFor(p => p.City).NotNull().NotEmpty().Length(3, 100);
             RuleFor(p => p.Email).NotNull().NotEmpty().EmailAddress();
             RuleFor(P => P.PostCode).NotNull().NotEmpty().Length(6).Matches("[0-9]{2}-[0-9]{3}").WithMessage("Please provide a valid postcode - example: 03-034.");

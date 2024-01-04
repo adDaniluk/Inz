@@ -10,6 +10,6 @@ namespace Inz.Repository
         public Task<OneOf<OkResponse, DatabaseExceptionResponse>> UpdatePatientAsyc(Patient patient);
         public Task<OneOf<Patient, NotFoundResponse, DatabaseExceptionResponse>> GetPatientAsync(int id);
         public Task<OneOf<bool, DatabaseExceptionResponse>> CheckExistingLoginAsync(string login);
-        public Task<OneOf<string, DatabaseExceptionResponse>> GetPasswordAsync(string login);
+        public Task<OneOf<Patient?, DatabaseExceptionResponse>> GetPatientByLoginAsync(string login);
     }
 }

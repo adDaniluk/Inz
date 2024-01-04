@@ -14,7 +14,6 @@ namespace Inz.Services
         private readonly IDoctorServiceRepository _doctorServiceRepository;
         private readonly IDiseaseRepository _diseaseRepository;
         private readonly ILogger _logger;
-        private readonly IPasswordHashService _passwordHashService;
         
         
 
@@ -23,15 +22,13 @@ namespace Inz.Services
             IServiceRepository serviceRepository,
             IDoctorServiceRepository doctorServiceRepository,
             IDiseaseRepository diseaseRepository,
-            ILogger<IDoctorService> logger,
-            IPasswordHashService passwordHashService)
+            ILogger<IDoctorService> logger)
         {
             _doctorRepository = doctorRepository;
             _medicalSpecializationRepository = medicalSpecializationRepository;
             _serviceRepository = serviceRepository;
             _doctorServiceRepository = doctorServiceRepository;
             _diseaseRepository = diseaseRepository;
-            _passwordHashService = passwordHashService;
             _logger = logger;
         }
 
@@ -58,7 +55,7 @@ namespace Inz.Services
             Doctor doctor = new()
             {
                 Login = doctorDTO.Login,
-                Password = _passwordHashService.GetHash(doctorDTO.Password),
+                Password = PasswordHashService.GetHash(doctorDTO.Password),
                 UserId = doctorDTO.UserId,
                 Email = doctorDTO.Email,
                 Phone = doctorDTO.Phone,

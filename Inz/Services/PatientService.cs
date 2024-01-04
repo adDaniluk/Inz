@@ -3,22 +3,18 @@ using Inz.Model;
 using Inz.OneOfHelper;
 using Inz.Repository;
 using OneOf;
-using System.Data.Common;
 
 namespace Inz.Services
 {
     public class PatientService : IPatientService
     {
         private readonly IPatientRepository _patientRepository;
-        private readonly IPasswordHashService _passwordHashService;
         private readonly ILogger _logger;
 
         public PatientService(IPatientRepository patientRepository,
-            ILogger<IPatientService> logger,
-            IPasswordHashService passwordHashService)
+            ILogger<IPatientService> logger)
         {
             _patientRepository = patientRepository;
-            _passwordHashService = passwordHashService;
             _logger = logger;
         }
 
@@ -45,7 +41,7 @@ namespace Inz.Services
             Patient patient = new Patient()
             {
                 Login = patientDTO.Login,
-                Password = _passwordHashService.GetHash(patientDTO.Password),
+                Password = PasswordHashService.GetHash(patientDTO.Password),
                 UserId = patientDTO.UserId,
                 Email = patientDTO.Email,
                 Phone = patientDTO.Phone,

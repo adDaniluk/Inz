@@ -6,20 +6,24 @@ using OneOf;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Inz.Repository;
 
 namespace Inz.Services
 {
     public class LoginService : ILoginService
     {
-        private readonly IPasswordHashService _passwordHashService;
         private readonly ILogger _logger;
         private readonly IConfiguration _configuration;
+        private readonly IDoctorRepository _doctorRepository;
+        private readonly IPatientRepository _patientRepository;
 
-        public LoginService(IPasswordHashService passwordHashService,
-            ILogger<PasswordHashService> logger,
+        public LoginService(ILogger<ILoginService> logger,
+            IPatientRepository patientRepository, 
+            IDoctorRepository doctorRepository,
             IConfiguration configuration)
         {
-            _passwordHashService = passwordHashService;
+            _patientRepository = patientRepository;
+            _doctorRepository = doctorRepository;
             _logger = logger;
             _configuration = configuration;
         }
@@ -27,24 +31,59 @@ namespace Inz.Services
         public async Task<OneOf<OkResponse, NotAutorizedResponse, DatabaseExceptionResponse>> SignIn(LoginDTO loginDTO)
         {
             string log;
+            bool isValidated = false;
+            int userId = new ();
 
-            var callbackValidate = await _passwordHashService.ValidatePassword(loginDTO);
-
-            if(!callbackValidate.TryPickT0(out bool isValidated, out var dbError))
+            switch (loginDTO.PersonType)
             {
-                log = $"Error on a database, see inner exception: {dbError.Exception.Message}";
-                _logger.LogError(message: log);
-                return dbError;
+                case PersonType.Doctor:
+                    {
+                        var callbackDoctor = await _doctorRepository.GetDoctorByLoginAsync(loginDTO.Login);
+
+                        if(callbackDoctor.TryPickT0(out Doctor? doctor, out var databaseError))
+                        {
+                            if(doctor != null && PasswordHashService.ValidatePassword(loginDTO.Password, doctor.Password))
+                            {
+                                userId = doctor.Id;
+                                isValidated = true;
+                                break;
+                            }
+                        }
+
+                        log = $"Error on a database, see inner exception: {databaseError.Exception.Message}";
+                        _logger.LogError(message: log);
+                        return databaseError;
+                    }
+
+                case PersonType.Patient:
+                    {
+                        var callbackPatient =  await _patientRepository.GetPatientByLoginAsync(loginDTO.Login);
+
+                        if(callbackPatient.TryPickT0(out Patient? patient, out var databaseError))
+                        {
+                            if(patient != null && PasswordHashService.ValidatePassword(loginDTO.Password, patient.Password))
+                            {
+                                userId = patient.Id;
+                                isValidated = true;
+                                break;
+                            }
+                        }
+
+                        log = $"Error on a database, see inner exception: {databaseError.Exception.Message}";
+                        _logger.LogError(message: log);
+                        return databaseError;
+                    }
             }
 
-            if(!isValidated)
+
+            if(!isValidated || userId == 0)
             {
                 log = "Username password does not match!";
                 _logger.LogInformation(message: log);
                 return new NotAutorizedResponse(log);
             }
 
-            var jwtToken = CreateToken(loginDTO);
+            var jwtToken = CreateToken(loginDTO, userId);
 
             if(jwtToken.TryPickT0(out string token, out var notAutorized))
             {
@@ -55,12 +94,11 @@ namespace Inz.Services
 
             log = "JWT could not be created";
             _logger.LogInformation(message: log);
-            return new NotAutorizedResponse(log);
-
-
+            notAutorized.ReponseMessage = log;
+            return notAutorized;
         }
 
-        private OneOf<string, NotAutorizedResponse> CreateToken(LoginDTO loginDTO)
+        private OneOf<string, NotAutorizedResponse> CreateToken(LoginDTO loginDTO, int userId)
         {
             List<Claim> claims = new();
             OneOf<string, NotAutorizedResponse> jwtHandler;
@@ -70,15 +108,12 @@ namespace Inz.Services
             string audience = _configuration.GetSection("Token")["Audience"]!;
             string issuer = _configuration.GetSection("Token")["Issuer"]!;
             int expireTimeInMinutesJWT = Int16.Parse(_configuration.GetSection("Token")["ExpireTimeInMinutesJWT"]!);
+            string role;
 
-            if (loginDTO.PersonType == PersonType.Doctor)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, "Doctor"));
-            }
-            else if (loginDTO.PersonType == PersonType.Patient)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, "Patient"));
-            }
+            role = loginDTO.PersonType == PersonType.Patient ? "Patient" : "Doctor";
+
+            claims.Add(new Claim(ClaimTypes.Role, role));
+            claims.Add(new Claim("Id", userId.ToString()));
 
             if(signingKey == null)
             {
@@ -116,6 +151,8 @@ namespace Inz.Services
             }
 
             jwtHandler = new NotAutorizedResponse();
+            log = "Token couldn't be crated";
+            _logger.LogInformation(message: log);
 
             return jwtHandler;
         }

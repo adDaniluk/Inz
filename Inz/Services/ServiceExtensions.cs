@@ -27,7 +27,6 @@ namespace Inz.Services
             services.AddScoped<IDoctorServiceRepository, DoctorServiceRepository>();
             services.AddScoped<IStatusRepository, StatusRepository>();
 
-            services.AddScoped<IPasswordHashService, PasswordHashService>();
             services.AddScoped<ILoginService, LoginService>();
 
             return services;

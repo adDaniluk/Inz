@@ -55,7 +55,7 @@ namespace Inz.Repository
                 return new DatabaseExceptionResponse(exception);
             }
         }
-
+        //TODO: Switch checkExisting Login with GetPatientByLogin
         public async Task<OneOf<bool, DatabaseExceptionResponse>> CheckExistingLoginAsync(string login)
         {
             try
@@ -69,12 +69,12 @@ namespace Inz.Repository
             }
         }
 
-        public async Task<OneOf<string, DatabaseExceptionResponse>> GetPasswordAsync(string login)
+        public async Task<OneOf<Patient?, DatabaseExceptionResponse>> GetPatientByLoginAsync(string login)
         {
             try
             {
-                Patient? patient = await _dbContextApi.Patients.SingleOrDefaultAsync(x => x.Login == login);
-                return patient == null ? "" : patient.Password;
+                Patient? patient = await _dbContextApi.Patients.SingleOrDefaultAsync(x => x.Login.ToLower() == login.ToLower());
+                return patient;
 
             }
             catch (Exception exception)

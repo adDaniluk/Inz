@@ -2,6 +2,7 @@
 using Inz.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Inz.Controllers
 {
@@ -26,6 +27,8 @@ namespace Inz.Controllers
         public async Task<IActionResult> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO)
         {
             _logger.LogInformation(message: $"Calling {nameof(UpdateDoctorAsync)}");
+
+            updateDoctorDTO.Id = Int16.Parse(User.Claims.Where(x => x.Type == "Id").First().Value);
 
             var callback = await _doctorService.UpdateDoctorAsync(updateDoctorDTO);
 
