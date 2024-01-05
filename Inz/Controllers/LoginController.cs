@@ -1,7 +1,6 @@
 ﻿using Inz.DTOModel;
 using Inz.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace Inz.Controllers
 {

@@ -40,43 +40,44 @@ namespace Inz.Services
                     {
                         var callbackDoctor = await _doctorRepository.GetDoctorByLoginAsync(loginDTO.Login);
 
-                        if(callbackDoctor.TryPickT0(out Doctor? doctor, out var databaseError))
+                        if(callbackDoctor.TryPickT1(out var databaseError, out Doctor? doctor))
                         {
-                            if(doctor != null && PasswordHashService.ValidatePassword(loginDTO.Password, doctor.Password))
-                            {
-                                userId = doctor.Id;
-                                isValidated = true;
-                                break;
-                            }
+                            log = $"Error on a database, see inner exception: {databaseError.Exception.Message}";
+                            _logger.LogError(message: log);
+                            return databaseError;
                         }
 
-                        log = $"Error on a database, see inner exception: {databaseError.Exception.Message}";
-                        _logger.LogError(message: log);
-                        return databaseError;
+                        if (doctor != null && PasswordHashService.ValidatePassword(loginDTO.Password, doctor.Password))
+                        {
+                            userId = doctor.Id;
+                            isValidated = true;
+                            break;
+                        }
+                        break;
                     }
-
                 case PersonType.Patient:
                     {
                         var callbackPatient =  await _patientRepository.GetPatientByLoginAsync(loginDTO.Login);
 
-                        if(callbackPatient.TryPickT0(out Patient? patient, out var databaseError))
+                        if(callbackPatient.TryPickT1(out var databaseError, out Patient? patient))
                         {
-                            if(patient != null && PasswordHashService.ValidatePassword(loginDTO.Password, patient.Password))
-                            {
-                                userId = patient.Id;
-                                isValidated = true;
-                                break;
-                            }
+                            log = $"Error on a database, see inner exception: {databaseError.Exception.Message}";
+                            _logger.LogError(message: log);
+                            return databaseError;
                         }
 
-                        log = $"Error on a database, see inner exception: {databaseError.Exception.Message}";
-                        _logger.LogError(message: log);
-                        return databaseError;
+                        if (patient != null && PasswordHashService.ValidatePassword(loginDTO.Password, patient.Password))
+                        {
+                            userId = patient.Id;
+                            isValidated = true;
+                            break;
+                        }
+                        break;
                     }
             }
 
 
-            if(!isValidated || userId == 0)
+            if(!isValidated)
             {
                 log = "Username password does not match!";
                 _logger.LogInformation(message: log);

@@ -1,8 +1,8 @@
 ﻿using Inz.DTOModel;
+using Inz.Helpers;
 using Inz.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace Inz.Controllers
 {
@@ -16,7 +16,8 @@ namespace Inz.Controllers
 
         public const string dbErrorInformation = "Cannot connect to the database, please contact Admin@admin.admin. See inner exception:";
 
-        public DoctorAccountController(IDoctorService doctorService, ILogger<IDoctorAccountController> logger)
+        public DoctorAccountController(IDoctorService doctorService,
+            ILogger<IDoctorAccountController> logger)
         {
             _doctorService = doctorService;
             _logger = logger;
@@ -28,7 +29,7 @@ namespace Inz.Controllers
         {
             _logger.LogInformation(message: $"Calling {nameof(UpdateDoctorAsync)}");
 
-            updateDoctorDTO.Id = Int16.Parse(User.Claims.Where(x => x.Type == "Id").First().Value);
+            updateDoctorDTO.Id = ClaimsHelper.GetUserIdFromClaims(HttpContext);
 
             var callback = await _doctorService.UpdateDoctorAsync(updateDoctorDTO);
 
@@ -46,6 +47,8 @@ namespace Inz.Controllers
         {
             _logger.LogInformation($"Calling {nameof(AddDoctorServiceAsync)}");
 
+            serviceDoctorDTO.DoctorId = ClaimsHelper.GetUserIdFromClaims(HttpContext);
+
             var callback = await _doctorService.AddDoctorServiceAsync(serviceDoctorDTO);
 
             IActionResult actionResult = callback.Match(
@@ -61,6 +64,8 @@ namespace Inz.Controllers
         public async Task<IActionResult> RemoveDoctorServiceAsync(RemoveDoctorServiceDTO removeDoctorServiceDTO)
         {
             _logger.LogInformation($"Calling {nameof(RemoveDoctorServiceAsync)}");
+
+            removeDoctorServiceDTO.DoctorId = ClaimsHelper.GetUserIdFromClaims(HttpContext);
 
             var callback = await _doctorService.RemoveDoctorServiceAsync(removeDoctorServiceDTO);
 
