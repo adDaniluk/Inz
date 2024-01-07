@@ -1,4 +1,5 @@
 ﻿using Inz.DTOModel;
+using Inz.Helpers;
 using Inz.Model;
 using Inz.OneOfHelper;
 using Inz.Repository;
@@ -14,9 +15,7 @@ namespace Inz.Services
         private readonly IDoctorServiceRepository _doctorServiceRepository;
         private readonly IDiseaseRepository _diseaseRepository;
         private readonly ILogger _logger;
-        
-        
-
+               
         public DoctorService(IDoctorRepository doctorRepository,
             IMedicalSpecializationRepository medicalSpecializationRepository, 
             IServiceRepository serviceRepository,
@@ -36,26 +35,26 @@ namespace Inz.Services
         {
             string log;
 
-            var callbackCheckLoginAvailability = await _doctorRepository.CheckExistingLoginAsync(doctorDTO.Login);
+            var callbackCheckLoginAvailability = await _doctorRepository.GetDoctorByLoginAsync(doctorDTO.Login);
 
             if(callbackCheckLoginAvailability.TryPickT1(out var databaseException, out var loginAvailibilityCheck))
             {
                 log = $"Error on a database, see inner exception: {databaseException.Exception.Message}";
-                _logger.LogError(message: log);
+                _logger.LogError("{log}", log);
                 return databaseException;
             }
 
-            if (!loginAvailibilityCheck)
+            if (loginAvailibilityCheck != null)
             {
                 log = $"Login with a name {doctorDTO.Login} is already taken, please insert a new one - has to be uniq";
-                _logger.LogError(message: log);
+                _logger.LogError("{log}", log);
                 return new AlreadyExistResponse(log);
             }
 
             Doctor doctor = new()
             {
                 Login = doctorDTO.Login,
-                Password = PasswordHashService.GetHash(doctorDTO.Password),
+                Password = PasswordHashHelper.GetHash(doctorDTO.Password),
                 UserId = doctorDTO.UserId,
                 Email = doctorDTO.Email,
                 Phone = doctorDTO.Phone,
@@ -79,13 +78,13 @@ namespace Inz.Services
             if(callbackInsertDoctor.TryPickT0(out OkResponse okResponse, out DatabaseExceptionResponse dbException))
             {
                 log = "Doctor has been created";
-                _logger.LogInformation(message: log);
+                _logger.LogInformation("{log}", log);
                 okResponse.ResponseMessage = log;
                 return okResponse;
             }
 
             log = $"Error on a database, see inner exception: {dbException.Exception.Message}";
-            _logger.LogError(message: log);
+            _logger.LogError("{log}", log);
             return dbException;
         }
 
@@ -101,7 +100,7 @@ namespace Inz.Services
                 if(doctorToUpdate == null)
                 {
                     log = $"Doctor with id {updateDoctorDTO.Id} does not exist.";
-                    _logger.LogError(message: log);
+                    _logger.LogError("{log}", log);
                     responseHandler = new NotFoundResponse(log);
                     return responseHandler;
                 }
@@ -121,7 +120,7 @@ namespace Inz.Services
                         dbException =>
                         {
                             log = $"Database exception, please look into: {dbException.Exception.Message}";
-                            _logger.LogError(message: log);
+                            _logger.LogError("{log}", log);
                             responseHandler = dbException;
                         });
 
@@ -146,7 +145,7 @@ namespace Inz.Services
                     dbException =>
                     {
                         log = $"Database exception, please look into: {dbException.Exception.Message}";
-                        _logger.LogError(message: log);
+                        _logger.LogError("{log}", log);
                         responseHandler = dbException;
                     });
 
@@ -171,13 +170,13 @@ namespace Inz.Services
                     okResponse =>
                     {
                         log = $"Doctor with ID: {updateDoctorDTO.Id} has been updated";
-                        _logger.LogInformation(message: log);
+                        _logger.LogInformation("{log}", log);
                         responseHandler = new OkResponse(log);
                     },
                     dbErrorUpdateDoctor =>
                     {
                         log = $"Database exception, please look into: {dbError.Exception.Message}";
-                        _logger.LogError(message: log);
+                        _logger.LogError("{log}", log);
                         responseHandler = dbErrorUpdateDoctor;
                     });
 
@@ -185,7 +184,7 @@ namespace Inz.Services
             }
 
             log = $"Database exception, please look into: {dbError.Exception.Message}";
-            _logger.LogError(message: log);
+            _logger.LogError("{log}", log);
             return dbError;
         }
 
@@ -205,30 +204,30 @@ namespace Inz.Services
 
             if(dbErrorDoctor != null || dbErrorService != null || dbErrorDoctorService != null)
             {
-                DatabaseExceptionResponse dbException = dbErrorDoctor != null ? dbErrorDoctor : (dbErrorService != null ? dbErrorService : dbErrorDoctorService);
+                DatabaseExceptionResponse dbException = dbErrorDoctor ?? (dbErrorService ?? dbErrorDoctorService);
                 log = $"Database exception, please look into: {dbException.Exception.Message}";
-                _logger.LogError(message: log);
+                _logger.LogError("{log}", log);
                 return dbException;
             }
 
             if (doctor == null)
             {
                 log = $"Doctor with id {serviceDoctorDTO.DoctorId} does not exist";
-                _logger.LogInformation(message: log);
+                _logger.LogInformation("{log}", log);
                 return new NotFoundResponse(log);
             }
 
             if(service == null)
             {
                 log = $"Service with id {serviceDoctorDTO.ServiceId} does not exist";
-                _logger.LogInformation(message: log);
+                _logger.LogInformation("{log}", log);
                 return new NotFoundResponse(log);
             }
 
             if(doctorServices != null)
             {
                 log = $"DoctorService with service id: {serviceDoctorDTO.ServiceId} and doctor id: {serviceDoctorDTO.DoctorId} already exist.";
-                _logger.LogInformation(message: log);
+                _logger.LogInformation("{log}", log);
                 return new NotFoundResponse(log);
             }
 
@@ -244,13 +243,13 @@ namespace Inz.Services
             if(callbackAddDoctorService.TryPickT0(out var okResponse, out var dbErrorAddDoctorService))
             {
                 log = $"DoctorService has been added";
-                _logger.LogInformation(message: log);
+                _logger.LogInformation("{log}", log);
                 okResponse.ResponseMessage = log;
                 return okResponse;
             }
 
             log = $"Database exception, please look into: {dbErrorAddDoctorService.Exception.Message}";
-            _logger.LogError(message: log);
+            _logger.LogError("{log}", log);
             return dbErrorAddDoctorService;
         }
 
@@ -271,29 +270,40 @@ namespace Inz.Services
                 if(callbackDeleteServiceDoctor.TryPickT0(out OkResponse okResponse, out var dbError))
                 {
                     log = $"DoctorService has been removed successfuly.";
-                    _logger.LogInformation(message: log);
+                    _logger.LogInformation("{log}", log);
                     okResponse.ResponseMessage = log;
                     return okResponse;
                 }
 
                 log = $"Database exception, please look into: {dbError.Exception.Message}";
-                _logger.LogError(message: log);
+                _logger.LogError("{log}", log);
                 return dbError;
             }
 
             return remainderErrors;
-            //if (remainderErrors.IsT0)
-            //{
-            //    log = $"DoctorService does not exist.";
-            //    _logger.LogInformation(message: log);
-            //    return new NotFoundResponse(log);
-            //}
-            //else
-            //{
-            //    log = $"Database exception, please look into: {remainderErrors.AsT1.Exception.Message}";
-            //    _logger.LogError(message: log);
-            //    return remainderErrors.AsT1;
-            //}
+        }
+
+        public async Task<OneOf<Doctor, NotFoundResponse, DatabaseExceptionResponse>> GetDoctorProfileAsync(int id)
+        {
+            string log;
+
+            var callbackDoctor = await _doctorRepository.GetDoctorByIdAsync(id);
+
+            if(callbackDoctor.TryPickT1(out var databaseError, out var doctor))
+            {
+                log = $"Database exception, please look into: {databaseError.Exception.Message}";
+                _logger.LogError("{log}", log);
+                return databaseError;
+            }
+
+            if(doctor != null)
+            {
+                return doctor;
+            }
+
+            log = $"Doctor with id: {id} does not exist.";
+            _logger.LogError("{log}", log);
+            return new NotFoundResponse(log);
         }
 
         //Generic validation method -> as a sample

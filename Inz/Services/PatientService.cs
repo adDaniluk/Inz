@@ -1,4 +1,5 @@
 ﻿using Inz.DTOModel;
+using Inz.Helpers;
 using Inz.Model;
 using Inz.OneOfHelper;
 using Inz.Repository;
@@ -18,30 +19,55 @@ namespace Inz.Services
             _logger = logger;
         }
 
+        public async Task<OneOf<Patient, NotFoundResponse, DatabaseExceptionResponse>> GetPatientProfileAsync(int id)
+        {
+            string log;
+
+            var callbackPatient = await _patientRepository.GetPatientByIdAsync(id);
+
+            if(callbackPatient.TryPickT0(out var patient, out var databaseException))
+            {
+                if(patient !=  null)
+                {
+                    log = $"Patient profile has been sent with Id: {id}";
+                    _logger.LogInformation("{log}", log);
+                    return patient;
+                }
+
+                log = $"Patient with Id: {id} does not exist.";
+                _logger.LogInformation("{log}", log);
+                return new NotFoundResponse(log);
+            }
+
+            log = $"Error on a database, see inner exception: {databaseException.Exception.Message}";
+            _logger.LogError("{log}", log);
+            return databaseException;
+        }
+
         public async Task<OneOf<OkResponse, AlreadyExistResponse, DatabaseExceptionResponse>> InsertPatientAsync(PatientDTO patientDTO)
         {
             string log;
 
-            var callbackCheckLoginAvailability = await _patientRepository.CheckExistingLoginAsync(patientDTO.Login);
+            var callbackCheckLoginAvailability = await _patientRepository.GetPatientByLoginAsync(patientDTO.Login);
 
             if (callbackCheckLoginAvailability.TryPickT1(out var dbErrorLoginCheck, out var loginAvailibilityCheck))
             {
                 log = $"Error on a database, see inner exception: {dbErrorLoginCheck.Exception.Message}";
-                _logger.LogError(message: log);
+                _logger.LogError("{log}", log);
                 return dbErrorLoginCheck;
             }
 
-            if(!loginAvailibilityCheck)
+            if (loginAvailibilityCheck != null)
             {
                 log = $"Login with a name {patientDTO.Login} is already taken, please insert a new one - has to be uniq";
-                _logger.LogError(message: log);
+                _logger.LogError("{log}", log);
                 return new AlreadyExistResponse(log);
             }
 
-            Patient patient = new Patient()
+            Patient patient = new()
             {
                 Login = patientDTO.Login,
-                Password = PasswordHashService.GetHash(patientDTO.Password),
+                Password = PasswordHashHelper.GetHash(patientDTO.Password),
                 UserId = patientDTO.UserId,
                 Email = patientDTO.Email,
                 Phone = patientDTO.Phone,
@@ -64,13 +90,13 @@ namespace Inz.Services
             if (callbackInsertPatient.TryPickT0(out var okResponse, out var dbException))
             {
                 log = "Patient has been added";
-                _logger.LogInformation(message: log);
+                _logger.LogInformation("{log}", log);
                 okResponse.ResponseMessage = log;
                 return okResponse;
             }
 
             log = $"Error on a database, see inner exception: {dbException.Exception.Message}";
-            _logger.LogError(message: log);
+            _logger.LogError("{log}", log);
             return dbException;
         }
 
@@ -78,18 +104,17 @@ namespace Inz.Services
         {
             string log;
 
-            var callbackPatientToUpdate = await _patientRepository.GetPatientAsync(updatePatientDTO.Id);
+            var callbackPatientToUpdate = await _patientRepository.GetPatientByIdAsync(updatePatientDTO.Id);
 
-            if (callbackPatientToUpdate.TryPickT1(out NotFoundResponse notFound, out var oneOfPatientOrDatabaseException))
+            if (callbackPatientToUpdate.TryPickT0(out Patient? patient, out var databaseException))
             {
-                log = $"Patient with id: {updatePatientDTO.Id} does not exist.";
-                _logger.LogInformation(message: log);
-                notFound.ResponseMessage = log;
-                return notFound;
-            }
+                if(patient == null)
+                {
+                    log = $"Patient with id: {updatePatientDTO.Id} does not exist.";
+                    _logger.LogInformation("{log}", log);
+                    return new NotFoundResponse(log);
+                }
 
-            if (oneOfPatientOrDatabaseException.TryPickT0(out Patient patient, out var exceptionResponse))
-            {
                 patient.Email = updatePatientDTO.Email;
                 patient.Phone = updatePatientDTO.Phone;
                 patient.Address.Street = updatePatientDTO.Street;
@@ -103,19 +128,19 @@ namespace Inz.Services
                 if (callbackUpdatePatient.TryPickT0(out OkResponse okResponse, out var exceptionOnUpdate))
                 {
                     log = $"Patient with ID: {patient.Id} has been updated";
-                    _logger.LogInformation(message: log);
+                    _logger.LogInformation("{log}", log);
                     okResponse.ResponseMessage = log;
                     return okResponse;
                 }
 
                 log = $"Error on a database, see inner exception: {exceptionOnUpdate.Exception.Message}";
-                _logger.LogError(message: log);
+                _logger.LogError("{log}", log);
                 return exceptionOnUpdate;
             }
 
-            log = $"Error on a database, see inner exception: {exceptionResponse.Exception.Message}";
-            _logger.LogError(message: log);
-            return exceptionResponse;
+            log = $"Error on a database, see inner exception: {databaseException.Exception.Message}";
+            _logger.LogError("{log}", log);
+            return databaseException;
         }
     }
 }

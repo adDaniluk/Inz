@@ -1,11 +1,13 @@
 ﻿using Inz.Context;
 using Inz.DTOModel;
 using Inz.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Inz.Controllers
 {
     [ApiController]
+    [AllowAnonymous]
     [Route("api/[controller]")]
     public class RegisterController : ControllerBase, IRegisterControler 
     {

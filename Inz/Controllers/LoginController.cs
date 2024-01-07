@@ -1,10 +1,12 @@
 ﻿using Inz.DTOModel;
 using Inz.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Inz.Controllers
 {
     [Route("api/[controller]")]
+    [AllowAnonymous]
     [ApiController]
     public class LoginController : ControllerBase, ILoginController
     {

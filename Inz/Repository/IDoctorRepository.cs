@@ -10,6 +10,5 @@ namespace Inz.Repository
         public Task<OneOf<Doctor?, DatabaseExceptionResponse>> GetDoctorByIdAsync(int id);
         public Task<OneOf<Doctor?, DatabaseExceptionResponse>> GetDoctorByLoginAsync(string login);
         public Task<OneOf<OkResponse, DatabaseExceptionResponse>> UpdateDoctorAsync(Doctor doctor);
-        public Task<OneOf<bool, DatabaseExceptionResponse>> CheckExistingLoginAsync(string login);
     }
 }

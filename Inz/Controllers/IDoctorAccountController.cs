@@ -8,5 +8,6 @@ namespace Inz.Controllers
         public Task<IActionResult> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO);
         public Task<IActionResult> AddDoctorServiceAsync(DoctorServiceDTO serviceDTO);
         public Task<IActionResult> RemoveDoctorServiceAsync(RemoveDoctorServiceDTO removeDoctorServiceDTO);
+        public Task<IActionResult> GetDoctorAsync();
     }
 }

@@ -1,6 +1,6 @@
-﻿namespace Inz.Services
+﻿namespace Inz.Helpers
 {
-    public static class PasswordHashService
+    public static class PasswordHashHelper
     {
         public static string GetHash(string password)
         {

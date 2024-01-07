@@ -7,6 +7,7 @@ using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Inz.Repository;
+using Inz.Helpers;
 
 namespace Inz.Services
 {
@@ -40,14 +41,14 @@ namespace Inz.Services
                     {
                         var callbackDoctor = await _doctorRepository.GetDoctorByLoginAsync(loginDTO.Login);
 
-                        if(callbackDoctor.TryPickT1(out var databaseError, out Doctor? doctor))
+                        if(!callbackDoctor.TryPickT0(out Doctor? doctor, out var databaseError))
                         {
                             log = $"Error on a database, see inner exception: {databaseError.Exception.Message}";
-                            _logger.LogError(message: log);
+                            _logger.LogError("{log}", log);
                             return databaseError;
                         }
 
-                        if (doctor != null && PasswordHashService.ValidatePassword(loginDTO.Password, doctor.Password))
+                        if (doctor != null && PasswordHashHelper.ValidatePassword(loginDTO.Password, doctor.Password))
                         {
                             userId = doctor.Id;
                             isValidated = true;
@@ -59,14 +60,14 @@ namespace Inz.Services
                     {
                         var callbackPatient =  await _patientRepository.GetPatientByLoginAsync(loginDTO.Login);
 
-                        if(callbackPatient.TryPickT1(out var databaseError, out Patient? patient))
+                        if(!callbackPatient.TryPickT0(out Patient? patient, out var databaseError))
                         {
                             log = $"Error on a database, see inner exception: {databaseError.Exception.Message}";
-                            _logger.LogError(message: log);
+                            _logger.LogError("{log}", log);
                             return databaseError;
                         }
 
-                        if (patient != null && PasswordHashService.ValidatePassword(loginDTO.Password, patient.Password))
+                        if (patient != null && PasswordHashHelper.ValidatePassword(loginDTO.Password, patient.Password))
                         {
                             userId = patient.Id;
                             isValidated = true;
@@ -76,11 +77,10 @@ namespace Inz.Services
                     }
             }
 
-
             if(!isValidated)
             {
                 log = "Username password does not match!";
-                _logger.LogInformation(message: log);
+                _logger.LogInformation("{log}", log);
                 return new NotAutorizedResponse(log);
             }
 
@@ -89,12 +89,12 @@ namespace Inz.Services
             if(jwtToken.TryPickT0(out string token, out var notAutorized))
             {
                 log = $"User: {loginDTO.Login} has logged in";
-                _logger.LogInformation(message: log);
+                _logger.LogInformation("{log}", log);
                 return new OkResponse(token);
             }
 
             log = "JWT could not be created";
-            _logger.LogInformation(message: log);
+            _logger.LogInformation("{log}", log);
             notAutorized.ReponseMessage = log;
             return notAutorized;
         }
@@ -119,19 +119,19 @@ namespace Inz.Services
             if(signingKey == null)
             {
                 log = "SigningKey configuration is missing";
-                _logger.LogInformation(message: log);
+                _logger.LogInformation("{log}", log);
             }
 
             if(audience == null)
             {
                 log = "Audience configuration is missing";
-                _logger.LogInformation(message: log);
+                _logger.LogInformation("{log}", log);
             }
 
             if(issuer == null)
             {
                 log = "Issuer configuration is missing";
-                _logger.LogInformation(message: log);
+                _logger.LogInformation("{log}", log);
             }
 
             if (signingKey != null && audience != null && issuer != null)
@@ -153,7 +153,7 @@ namespace Inz.Services
 
             jwtHandler = new NotAutorizedResponse();
             log = "Token couldn't be crated";
-            _logger.LogInformation(message: log);
+            _logger.LogInformation("{log}", log);
 
             return jwtHandler;
         }

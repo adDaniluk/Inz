@@ -6,5 +6,6 @@ namespace Inz.Controllers
     public interface IPatientAccountController
     {
         public Task<IActionResult> UpdatePatientAsync(UpdatePatientDTO updatePatientDTO);
+        public Task<IActionResult> GetPatientProfileAsync();
     }
 }

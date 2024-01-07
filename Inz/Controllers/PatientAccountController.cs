@@ -1,4 +1,5 @@
 ﻿using Inz.DTOModel;
+using Inz.Helpers;
 using Inz.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,12 +28,30 @@ namespace Inz.Controllers
         {
             _logger.LogInformation(message: $"Calling {nameof(UpdatePatientAsync)}");
 
-            updatePatientDTO.Id = Int16.Parse(User.Claims.Where(x => x.Type == "Id").First().Value);
+            updatePatientDTO.Id = ClaimsHelper.GetUserIdFromClaims(HttpContext);
 
             var callback = await _patientService.UpdatePatientAsyc(updatePatientDTO);
 
             IActionResult actionResult = callback.Match(
                 patient => Ok(patient.ResponseMessage),
+                notFound => NotFound(notFound.ResponseMessage),
+                databaseException => Problem($"{dbErrorInformation}: {databaseException.Exception.Message}"));
+
+            return actionResult;
+        }
+
+        [Route("Profile")]
+        [HttpGet]
+        public async Task<IActionResult> GetPatientProfileAsync()
+        {
+            _logger.LogInformation(message: $"Calling {nameof(GetPatientProfileAsync)}");
+
+            int id = ClaimsHelper.GetUserIdFromClaims(HttpContext);
+
+            var callback = await _patientService.GetPatientProfileAsync(id);
+
+            IActionResult actionResult = callback.Match(
+                patient => Ok(patient),
                 notFound => NotFound(notFound.ResponseMessage),
                 databaseException => Problem($"{dbErrorInformation}: {databaseException.Exception.Message}"));
 

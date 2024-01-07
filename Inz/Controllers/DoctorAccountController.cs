@@ -76,5 +76,23 @@ namespace Inz.Controllers
 
             return actionResult;
         }
+
+        [Route("Profile")]
+        [HttpGet]
+        public async Task<IActionResult> GetDoctorAsync()
+        {
+            _logger.LogInformation($"Calling {nameof(GetDoctorAsync)}");
+
+            int id = ClaimsHelper.GetUserIdFromClaims(HttpContext);
+
+            var callback = await _doctorService.GetDoctorProfileAsync(id);
+
+            IActionResult actionResult = callback.Match(
+                doctor => Ok(doctor),
+                notFound => NotFound(notFound.ResponseMessage),
+                databaseException => Problem($"{dbErrorInformation}: {databaseException.Exception.Message}"));
+
+            return actionResult;
+        }
     }
 }
