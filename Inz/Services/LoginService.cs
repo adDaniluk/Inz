@@ -43,7 +43,7 @@ namespace Inz.Services
 
                         if(!callbackDoctor.TryPickT0(out Doctor? doctor, out var databaseError))
                         {
-                            log = $"Error on a database, see inner exception: {databaseError.Exception.Message}";
+                            log = $"{LogHelper.DatabaseError}{databaseError.Exception.Message}";
                             _logger.LogError("{log}", log);
                             return databaseError;
                         }
@@ -62,7 +62,7 @@ namespace Inz.Services
 
                         if(!callbackPatient.TryPickT0(out Patient? patient, out var databaseError))
                         {
-                            log = $"Error on a database, see inner exception: {databaseError.Exception.Message}";
+                            log = $"{LogHelper.DatabaseError}{databaseError.Exception.Message}";
                             _logger.LogError("{log}", log);
                             return databaseError;
                         }

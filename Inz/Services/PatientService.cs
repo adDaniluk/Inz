@@ -39,7 +39,7 @@ namespace Inz.Services
                 return new NotFoundResponse(log);
             }
 
-            log = $"Error on a database, see inner exception: {databaseException.Exception.Message}";
+            log = $"{LogHelper.DatabaseError}{databaseException.Exception.Message}";
             _logger.LogError("{log}", log);
             return databaseException;
         }
@@ -52,7 +52,7 @@ namespace Inz.Services
 
             if (callbackCheckLoginAvailability.TryPickT1(out var dbErrorLoginCheck, out var loginAvailibilityCheck))
             {
-                log = $"Error on a database, see inner exception: {dbErrorLoginCheck.Exception.Message}";
+                log = $"{LogHelper.DatabaseError}{dbErrorLoginCheck.Exception.Message}";
                 _logger.LogError("{log}", log);
                 return dbErrorLoginCheck;
             }
@@ -95,7 +95,7 @@ namespace Inz.Services
                 return okResponse;
             }
 
-            log = $"Error on a database, see inner exception: {dbException.Exception.Message}";
+            log = $"{LogHelper.DatabaseError}{dbException.Exception.Message}";
             _logger.LogError("{log}", log);
             return dbException;
         }
@@ -133,12 +133,12 @@ namespace Inz.Services
                     return okResponse;
                 }
 
-                log = $"Error on a database, see inner exception: {exceptionOnUpdate.Exception.Message}";
+                log = $"{LogHelper.DatabaseError}{exceptionOnUpdate.Exception.Message}";
                 _logger.LogError("{log}", log);
                 return exceptionOnUpdate;
             }
 
-            log = $"Error on a database, see inner exception: {databaseException.Exception.Message}";
+            log = $"{LogHelper.DatabaseError}{databaseException.Exception.Message}";
             _logger.LogError("{log}", log);
             return databaseException;
         }

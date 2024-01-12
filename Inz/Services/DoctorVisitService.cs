@@ -39,7 +39,7 @@ namespace Inz.Services
 
             if (callbackCalendar.TryPickT1(out var dbErrorCalendar, out var calendarToUpdate))
             {
-                log = $"Error on a database, see inner exception: {dbErrorCalendar.Exception.Message}";
+                log = $"{LogHelper.DatabaseError}{dbErrorCalendar.Exception.Message}";
                 _logger.LogError(message: log);
                 return dbErrorCalendar;
             }
@@ -55,7 +55,7 @@ namespace Inz.Services
 
             if (callbackStatusOpen.TryPickT1(out var dbErrorStatusCheckOpen, out var statusOpen))
             {
-                log = $"Error on a database, see inner exception: {dbErrorStatusCheckOpen.Exception.Message}";
+                log = $"{LogHelper.DatabaseError}{dbErrorStatusCheckOpen.Exception.Message}";
                 _logger.LogError(message: log);
                 return dbErrorStatusCheckOpen;
             }
@@ -78,7 +78,7 @@ namespace Inz.Services
             
             if(callbackDoctorService.TryPickT1(out var dbErrorDoctorService, out var doctorService))
             {
-                log = $"Error on a database, see inner exception: {dbErrorDoctorService.Exception.Message}";
+                log = $"{LogHelper.DatabaseError}{dbErrorDoctorService.Exception.Message}";
                 _logger.LogError(message: log);
                 return dbErrorDoctorService;
             }
@@ -94,7 +94,7 @@ namespace Inz.Services
 
             if(callbackStatusReserved.TryPickT1(out var dbErrorStatusCheckReserved, out var statusReserved))
             {
-                log = $"Error on a database, see inner exception: {dbErrorStatusCheckReserved.Exception.Message}";
+                log = $"{LogHelper.DatabaseError}{dbErrorStatusCheckReserved.Exception.Message}";
                 _logger.LogError(message: log);
                 return dbErrorStatusCheckReserved;
             }
@@ -120,7 +120,7 @@ namespace Inz.Services
 
             if(callbackCreateDoctorVisit.IsT1)
             {
-                log = $"Error on a database, see inner exception: {callbackCreateDoctorVisit.AsT1.Exception.Message}";
+                log = $"{LogHelper.DatabaseError}{callbackCreateDoctorVisit.AsT1.Exception.Message}";
                 _logger.LogError(message: log);
                 return callbackCreateDoctorVisit.AsT1;
             }
@@ -129,7 +129,7 @@ namespace Inz.Services
 
             if(callbackCalendarUpdate.TryPickT1(out var dbErrorCalendarUpdate, out var okResponse))
             {
-                log = $"Error on a database, see inner exception: {dbErrorCalendarUpdate.Exception.Message}";
+                log = $"{LogHelper.DatabaseError}{dbErrorCalendarUpdate.Exception.Message}";
                 _logger.LogError(message: log);
                 return dbErrorCalendarUpdate;
             }

@@ -9,7 +9,6 @@ namespace Inz.DTOModel.Validators
             RuleLevelCascadeMode = CascadeMode.Stop;
 
             RuleFor(s => s.ServiceId).NotEmpty().NotNull();
-            RuleFor(s => s.DoctorId).NotEmpty().NotNull(); 
         }
     }
 }

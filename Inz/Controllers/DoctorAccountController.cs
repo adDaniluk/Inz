@@ -14,8 +14,6 @@ namespace Inz.Controllers
         private readonly IDoctorService _doctorService;
         private readonly ILogger _logger;
 
-        public const string dbErrorInformation = "Cannot connect to the database, please contact Admin@admin.admin. See inner exception:";
-
         public DoctorAccountController(IDoctorService doctorService,
             ILogger<IDoctorAccountController> logger)
         {
@@ -36,7 +34,7 @@ namespace Inz.Controllers
             IActionResult actionResult = callback.Match(
                 okResult => Ok(okResult.ResponseMessage),
                 notFound => NotFound(notFound.ResponseMessage),
-                databaseException => Problem($"{dbErrorInformation}: {databaseException.Exception.Message}"));
+                databaseException => Problem($"{LogHelper.DatabaseErrorController}{databaseException.Exception.Message}"));
 
             return actionResult;
         }
@@ -54,7 +52,7 @@ namespace Inz.Controllers
             IActionResult actionResult = callback.Match(
                 doctorServices => Ok(doctorServices.ResponseMessage),
                 notFound => NotFound(notFound.ResponseMessage),
-                databaseException => Problem($"{dbErrorInformation}: {databaseException.Exception.Message}"));
+                databaseException => Problem($"{LogHelper.DatabaseErrorController}{databaseException.Exception.Message}"));
 
             return actionResult;
         }
@@ -72,7 +70,7 @@ namespace Inz.Controllers
             IActionResult actionResult = callback.Match(
                 doctorServices => Ok(doctorServices.ResponseMessage),
                 notFound => NotFound(notFound.ResponseMessage),
-                databaseException => Problem($"{dbErrorInformation}: {databaseException.Exception.Message}"));
+                databaseException => Problem($"{LogHelper.DatabaseErrorController}{databaseException.Exception.Message}"));
 
             return actionResult;
         }
@@ -90,7 +88,7 @@ namespace Inz.Controllers
             IActionResult actionResult = callback.Match(
                 doctor => Ok(doctor),
                 notFound => NotFound(notFound.ResponseMessage),
-                databaseException => Problem($"{dbErrorInformation}: {databaseException.Exception.Message}"));
+                databaseException => Problem($"{LogHelper.DatabaseErrorController}{databaseException.Exception.Message}"));
 
             return actionResult;
         }

@@ -39,7 +39,7 @@ namespace Inz.Services
 
             if(callbackCheckLoginAvailability.TryPickT1(out var databaseException, out var loginAvailibilityCheck))
             {
-                log = $"Error on a database, see inner exception: {databaseException.Exception.Message}";
+                log = $"{LogHelper.DatabaseError}{databaseException.Exception.Message}";
                 _logger.LogError("{log}", log);
                 return databaseException;
             }
@@ -83,7 +83,7 @@ namespace Inz.Services
                 return okResponse;
             }
 
-            log = $"Error on a database, see inner exception: {dbException.Exception.Message}";
+            log = $"{LogHelper.DatabaseError}{dbException.Exception.Message}";
             _logger.LogError("{log}", log);
             return dbException;
         }
@@ -119,7 +119,7 @@ namespace Inz.Services
                         },
                         dbException =>
                         {
-                            log = $"Database exception, please look into: {dbException.Exception.Message}";
+                            log = $"{LogHelper.DatabaseError}{dbException.Exception.Message}";
                             _logger.LogError("{log}", log);
                             responseHandler = dbException;
                         });
@@ -144,7 +144,7 @@ namespace Inz.Services
                         },
                     dbException =>
                     {
-                        log = $"Database exception, please look into: {dbException.Exception.Message}";
+                        log = $"{LogHelper.DatabaseError}{dbException.Exception.Message}";
                         _logger.LogError("{log}", log);
                         responseHandler = dbException;
                     });
@@ -175,7 +175,7 @@ namespace Inz.Services
                     },
                     dbErrorUpdateDoctor =>
                     {
-                        log = $"Database exception, please look into: {dbError.Exception.Message}";
+                        log = $"{LogHelper.DatabaseError}{dbError.Exception.Message}";
                         _logger.LogError("{log}", log);
                         responseHandler = dbErrorUpdateDoctor;
                     });
@@ -183,7 +183,7 @@ namespace Inz.Services
                 return responseHandler;
             }
 
-            log = $"Database exception, please look into: {dbError.Exception.Message}";
+            log = $"{LogHelper.DatabaseError}{dbError.Exception.Message}";
             _logger.LogError("{log}", log);
             return dbError;
         }
@@ -196,7 +196,8 @@ namespace Inz.Services
             var callbackService = await _serviceRepository.GetServiceAsync(serviceDoctorDTO.ServiceId);
             var callbackDoctorService = await _doctorServiceRepository.GetDoctorServiceAsync(serviceDoctorDTO.DoctorId, serviceDoctorDTO.ServiceId);
 
-            //await Task.WhenAll(callbackDoctor, callbackService, callbackDoctorService);
+            // EF Core does not support multiple parallel operations
+            //await Task.WhenAll(taskCallbackDoctor, taskCallbackDoctorService, taskCallbackService);
 
             callbackDoctor.TryPickT0(out var doctor, out var dbErrorDoctor);
             callbackService.TryPickT0(out var service, out var dbErrorService);
@@ -205,7 +206,7 @@ namespace Inz.Services
             if(dbErrorDoctor != null || dbErrorService != null || dbErrorDoctorService != null)
             {
                 DatabaseExceptionResponse dbException = dbErrorDoctor ?? (dbErrorService ?? dbErrorDoctorService);
-                log = $"Database exception, please look into: {dbException.Exception.Message}";
+                log = $"{LogHelper.DatabaseError}{dbException.Exception.Message}";
                 _logger.LogError("{log}", log);
                 return dbException;
             }
@@ -248,7 +249,7 @@ namespace Inz.Services
                 return okResponse;
             }
 
-            log = $"Database exception, please look into: {dbErrorAddDoctorService.Exception.Message}";
+            log = $"{LogHelper.DatabaseError}{dbErrorAddDoctorService.Exception.Message}";
             _logger.LogError("{log}", log);
             return dbErrorAddDoctorService;
         }
@@ -259,25 +260,31 @@ namespace Inz.Services
 
             var callbackDoctorService = await _doctorServiceRepository.GetDoctorServiceAsync(removeDoctorServiceDTO.DoctorId, removeDoctorServiceDTO.ServiceId);
 
-            callbackDoctorService.TryPickT0(out var doctorServices, out var remainderErrors);
-            
-            if(doctorServices != null)
+            if (callbackDoctorService.TryPickT0(out var doctorServices, out var remainderErrors))
             {
-                DoctorServices doctorServiceToRemove = doctorServices;
 
-                var callbackDeleteServiceDoctor = await _doctorServiceRepository.RemoveDoctorServiceAsync(doctorServiceToRemove);
-               
-                if(callbackDeleteServiceDoctor.TryPickT0(out OkResponse okResponse, out var dbError))
+                if (doctorServices != null)
                 {
-                    log = $"DoctorService has been removed successfuly.";
-                    _logger.LogInformation("{log}", log);
-                    okResponse.ResponseMessage = log;
-                    return okResponse;
+                    DoctorServices doctorServiceToRemove = doctorServices;
+
+                    var callbackDeleteServiceDoctor = await _doctorServiceRepository.RemoveDoctorServiceAsync(doctorServiceToRemove);
+
+                    if (callbackDeleteServiceDoctor.TryPickT0(out OkResponse okResponse, out var dbError))
+                    {
+                        log = $"DoctorService has been removed successfuly.";
+                        _logger.LogInformation("{log}", log);
+                        okResponse.ResponseMessage = log;
+                        return okResponse;
+                    }
+
+                    log = $"{LogHelper.DatabaseError}{dbError.Exception.Message}";
+                    _logger.LogError("{log}", log);
+                    return dbError;
                 }
 
-                log = $"Database exception, please look into: {dbError.Exception.Message}";
-                _logger.LogError("{log}", log);
-                return dbError;
+                log = $"Provided DoctorService does not exist.";
+                _logger.LogInformation("{log}", log);
+                return new NotFoundResponse(log);
             }
 
             return remainderErrors;
@@ -291,7 +298,7 @@ namespace Inz.Services
 
             if(callbackDoctor.TryPickT1(out var databaseError, out var doctor))
             {
-                log = $"Database exception, please look into: {databaseError.Exception.Message}";
+                log = $"{LogHelper.DatabaseError}{databaseError.Exception.Message}";
                 _logger.LogError("{log}", log);
                 return databaseError;
             }

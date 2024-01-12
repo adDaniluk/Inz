@@ -1,4 +1,5 @@
 ﻿using Inz.DTOModel;
+using Inz.Helpers;
 using Inz.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,8 +14,6 @@ namespace Inz.Controllers
         private readonly ICalendarService _calendarService;
         private readonly IDoctorVisitService _doctorVisitService;
         private readonly ILogger _logger;
-
-        public const string dbErrorInformation = "Cannot connect to the database, please contact Admin@admin.admin. See inner exception:";
 
         public CalendarController(ICalendarService calendarService,
             IDoctorVisitService doctorVisitService,
@@ -37,7 +36,7 @@ namespace Inz.Controllers
             var actionResult = callback.Match(
                 calendar => Ok(calendar.ResponseMessage),
                 notFound => NotFound(notFound.ResponseMessage),
-                databaseException => Problem($"{dbErrorInformation}: {databaseException.Exception.Message}"));
+                databaseException => Problem($"{LogHelper.DatabaseErrorController}{databaseException.Exception.Message}"));
 
             return actionResult;
         }
@@ -56,7 +55,7 @@ namespace Inz.Controllers
             var actionResult = callback.Match(
                 calendar => Ok(calendar),
                 notFound => NotFound(notFound.ResponseMessage),
-                databaseException => Problem($"{dbErrorInformation}: {databaseException.Exception.Message}"));
+                databaseException => Problem($"{LogHelper.DatabaseErrorController}{databaseException.Exception.Message}"));
 
             return actionResult;
         }
@@ -72,7 +71,7 @@ namespace Inz.Controllers
             var actionResult = callback.Match(
                 calendar => Ok(calendar),
                 notFound => NotFound(notFound.ResponseMessage),
-                databaseException => Problem($"{dbErrorInformation}: {databaseException.Exception.Message}"));
+                databaseException => Problem($"{LogHelper.DatabaseErrorController}{databaseException.Exception.Message}"));
 
             return actionResult;
         }
@@ -90,7 +89,7 @@ namespace Inz.Controllers
             var actionResult = callback.Match(
                 calendar => Ok(calendar),
                 notFound => NotFound(notFound.ResponseMessage),
-                databaseException => Problem($"{dbErrorInformation}: {databaseException.Exception.Message}"));
+                databaseException => Problem($"{LogHelper.DatabaseErrorController}{databaseException.Exception.Message}"));
 
             return actionResult;
         }

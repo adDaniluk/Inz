@@ -46,7 +46,7 @@ namespace Inz.Services
                 },
                 dbException =>
                 {
-                    log = $"Error on a database, see inner exception: {dbException.Exception.Message}";
+                    log = $"{LogHelper.DatabaseError}{dbException.Exception.Message}";
                     _logger.LogError(message: log);
                     responseHandler = dbException;
                 });
@@ -96,7 +96,7 @@ namespace Inz.Services
                     },
                     dbException =>
                     {
-                        log = $"Error on a database, see inner exception: {dbException.Exception.Message}";
+                        log = $"{LogHelper.DatabaseError}{dbException.Exception.Message}";
                         _logger.LogError(message: log);
                         responseHandler = dbException;
                     }
@@ -114,7 +114,7 @@ namespace Inz.Services
                             responseHandler = new OkResponse(log);
                         },
                         dbError => {
-                            log = $"Error on a database, see inner exception: {dbError.Exception.Message}";
+                            log = $"{LogHelper.DatabaseError}{dbError.Exception.Message}";
                             _logger.LogError(message: log);
                             responseHandler = dbError;
                         });
@@ -145,7 +145,7 @@ namespace Inz.Services
                     },
                 databaseException =>
                 {
-                    log = $"Error on a database, see inner exception: {databaseException.Exception.Message}";
+                    log = $"{LogHelper.DatabaseError}{databaseException.Exception.Message}";
                     _logger.LogError(message: log);
                     responseHandler = databaseException;
                 });
@@ -178,7 +178,7 @@ namespace Inz.Services
             }
             else
             {
-                log = $"Error on a database, see inner exception: {databaseException.Exception.Message}";
+                log = $"{LogHelper.DatabaseError}{databaseException.Exception.Message}";
                 _logger.LogError(message: log);
                 return databaseException;
             }

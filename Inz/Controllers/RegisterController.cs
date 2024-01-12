@@ -1,5 +1,6 @@
 ﻿using Inz.Context;
 using Inz.DTOModel;
+using Inz.Helpers;
 using Inz.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,8 +16,6 @@ namespace Inz.Controllers
         private readonly ILogger<RegisterController> _logger;
         private readonly IPatientService _patientService;
         private readonly IDoctorService _doctorService;
-
-        public const string dbErrorInformation = "Cannot connect to the database, please contact Admin@admin.admin. See inner exception:";
 
         public RegisterController(DbContextApi dbContextApi,
             IDoctorService doctorService,
@@ -40,7 +39,7 @@ namespace Inz.Controllers
             IActionResult actionResult = callback.Match(
                 doctor => Ok(doctor.ResponseMessage),
                 conflict => Conflict(conflict.ResponseMessage),
-                databaseException => Problem($"{dbErrorInformation}: {databaseException.Exception.Message}"));
+                databaseException => Problem($"{LogHelper.DatabaseErrorController}{databaseException.Exception.Message}"));
 
             return actionResult;
         }
@@ -56,7 +55,7 @@ namespace Inz.Controllers
             IActionResult actionResult = callback.Match(
                 okResponse => Ok(okResponse.ResponseMessage),
                 conflict => Conflict(conflict.ResponseMessage),
-                databaseException => Problem($"{dbErrorInformation}: {databaseException.Exception.Message}"));
+                databaseException => Problem($"{LogHelper.DatabaseErrorController}{databaseException.Exception.Message}"));
 
             return actionResult;
         }

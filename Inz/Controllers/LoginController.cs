@@ -1,4 +1,5 @@
 ﻿using Inz.DTOModel;
+using Inz.Helpers;
 using Inz.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,8 +13,6 @@ namespace Inz.Controllers
     {
         private readonly ILoginService _loginService;
         private readonly ILogger _logger;
-
-        public const string dbErrorInformation = "Cannot connect to the database, please contact Admin@admin.admin. See inner exception:";
 
         public LoginController(ILoginService loginService, ILogger<LoginController> logger)
         {
@@ -31,7 +30,7 @@ namespace Inz.Controllers
             IActionResult response =  callback.Match(
                 okResponse => Ok(okResponse.ResponseMessage),
                 notAutorizedResponse => Ok(notAutorizedResponse.ReponseMessage),
-                databaseException => Problem($"{dbErrorInformation}: {databaseException.Exception.Message}"));
+                databaseException => Problem($"{LogHelper.DatabaseErrorController}{databaseException.Exception.Message}"));
 
             return response;
         }

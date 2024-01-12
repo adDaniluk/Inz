@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using FluentValidation.AspNetCore;
 using System.Reflection;
 using FluentValidation;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,8 +26,8 @@ builder.Configuration.GetSection("AzureSeverDB")["ConnectionString"]));
 
 builder.Services.AddCustomServices();
 
-//builder.Host.UseSerilog((ctx, lc)
-//    => lc.ReadFrom.Configuration(ctx.Configuration));
+builder.Host.UseSerilog((ctx, lc)
+    => lc.ReadFrom.Configuration(ctx.Configuration));
 
 builder.Configuration.AddUserSecrets<Program>(true);
 
