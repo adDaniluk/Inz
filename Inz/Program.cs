@@ -10,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
+
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
@@ -34,6 +36,8 @@ builder.Configuration.AddUserSecrets<Program>(true);
 builder.Services.AddAuthService(builder.Configuration);
 
 builder.Services.AddAuthorization();
+
+
 
 var app = builder.Build();
 

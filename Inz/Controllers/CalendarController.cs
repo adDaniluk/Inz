@@ -24,12 +24,12 @@ namespace Inz.Controllers
             _logger = logger;
         }
 
-        [Route("AddCalendar")]
+        [Route("calendars")]
         [Authorize(Roles = "Doctor")]
         [HttpPost]
-        public async Task<IActionResult> CreateCalendarAsync(CalendarDTO calendarDTO)
+        public async Task<IActionResult> CreateCalendarsAsync(CalendarDTO calendarDTO)
         {
-            _logger.LogInformation(message: $"Calling {nameof(CreateCalendarAsync)}");
+            _logger.LogInformation(message: $"Calling {nameof(CreateCalendarsAsync)}");
 
             var callback = await _calendarService.InsertCalendarAsync(calendarDTO);
 
@@ -41,11 +41,11 @@ namespace Inz.Controllers
             return actionResult;
         }
 
-        [Route("GetCalendar")]
+        [Route("calendar")]
         [HttpGet]
-        public async Task<IActionResult> GetCalendarAsync(int id)
+        public async Task<IActionResult> GetCalendarByIdAsync(int id)
         { 
-            _logger.LogInformation(message: $"Calling {nameof(GetCalendarAsync)}");
+            _logger.LogInformation(message: $"Calling {nameof(GetCalendarByIdAsync)}");
 
             if(id < 0)
                 return NotFound($"{id} cannot be negative");
@@ -60,7 +60,7 @@ namespace Inz.Controllers
             return actionResult;
         }
 
-        [Route("GetCalendars")]
+        [Route("calendars")]
         [HttpGet]
         public async Task<IActionResult> GetCalendarListByDateRangeAsync(DateTime startDate, DateTime endDate)
         {
@@ -77,7 +77,7 @@ namespace Inz.Controllers
         }
 
         
-        [Route("BookCalendar")]
+        [Route("calendar")]
         [HttpPut]
         [Authorize(Roles ="Patient")]
         public async Task<IActionResult> BookCalendarVisitAsync(DoctorVisitDTO doctorVisitDTO)

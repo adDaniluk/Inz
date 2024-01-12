@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Inz.Controllers
 {
-    public interface IDoctorAccountController
+    public interface IDoctorController
     {
         public Task<IActionResult> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO);
         public Task<IActionResult> AddDoctorServiceAsync(DoctorServiceDTO serviceDTO);

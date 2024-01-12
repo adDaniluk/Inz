@@ -9,19 +9,19 @@ namespace Inz.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "Doctor")]
-    public class DoctorAccountController : ControllerBase, IDoctorAccountController
+    public class DoctorController : ControllerBase, IDoctorController
     {
         private readonly IDoctorService _doctorService;
         private readonly ILogger _logger;
 
-        public DoctorAccountController(IDoctorService doctorService,
-            ILogger<IDoctorAccountController> logger)
+        public DoctorController(IDoctorService doctorService,
+            ILogger<IDoctorController> logger)
         {
             _doctorService = doctorService;
             _logger = logger;
         }
 
-        [Route("Update")]
+        [Route("profile")]
         [HttpPut]
         public async Task<IActionResult> UpdateDoctorAsync(UpdateDoctorDTO updateDoctorDTO)
         {
@@ -39,7 +39,7 @@ namespace Inz.Controllers
             return actionResult;
         }
 
-        [Route("AddService")]
+        [Route("service")]
         [HttpPost]
         public async Task<IActionResult> AddDoctorServiceAsync(DoctorServiceDTO serviceDoctorDTO)
         {
@@ -57,7 +57,7 @@ namespace Inz.Controllers
             return actionResult;
         }
 
-        [Route("RemoveService")]
+        [Route("service")]
         [HttpDelete]
         public async Task<IActionResult> RemoveDoctorServiceAsync(RemoveDoctorServiceDTO removeDoctorServiceDTO)
         {
@@ -75,7 +75,7 @@ namespace Inz.Controllers
             return actionResult;
         }
 
-        [Route("Profile")]
+        [Route("profile")]
         [HttpGet]
         public async Task<IActionResult> GetDoctorAsync()
         {

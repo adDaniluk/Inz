@@ -1,4 +1,5 @@
 ﻿using Inz.DTOModel;
+using Inz.Helpers;
 using Inz.Model;
 using Inz.OneOfHelper;
 using Inz.Repository;
@@ -40,14 +41,14 @@ namespace Inz.Services
             if (callbackCalendar.TryPickT1(out var dbErrorCalendar, out var calendarToUpdate))
             {
                 log = $"{LogHelper.DatabaseError}{dbErrorCalendar.Exception.Message}";
-                _logger.LogError(message: log);
+                _logger.LogError("{log}", log);
                 return dbErrorCalendar;
             }
 
             if(calendarToUpdate == null)
             {
                 log = $"Calendar with {doctorVisitDTO.CalendarId} does not exist.";
-                _logger.LogError(message: log);
+                _logger.LogError("{log}", log);
                 return new NotFoundResponse(log);
             }
 
@@ -56,21 +57,21 @@ namespace Inz.Services
             if (callbackStatusOpen.TryPickT1(out var dbErrorStatusCheckOpen, out var statusOpen))
             {
                 log = $"{LogHelper.DatabaseError}{dbErrorStatusCheckOpen.Exception.Message}";
-                _logger.LogError(message: log);
+                _logger.LogError("{log}", log);
                 return dbErrorStatusCheckOpen;
             }
 
             if (statusOpen == null)
             {
                 log = $"Status does not exist.";
-                _logger.LogError(message: log);
+                _logger.LogError("{log}", log);
                 return new NotFoundResponse(log);
             }
 
             if(calendarToUpdate.Status != statusOpen)
             {
                 log = $"The calendar is already booked.";
-                _logger.LogInformation(message: log);
+                _logger.LogInformation("{log}", log);
                 return new NotFoundResponse(log);
             }
 
@@ -79,14 +80,14 @@ namespace Inz.Services
             if(callbackDoctorService.TryPickT1(out var dbErrorDoctorService, out var doctorService))
             {
                 log = $"{LogHelper.DatabaseError}{dbErrorDoctorService.Exception.Message}";
-                _logger.LogError(message: log);
+                _logger.LogError("{log}", log);
                 return dbErrorDoctorService;
             }
 
             if (doctorService == null)
             {
                 log = $"Service does not exist for picked doctor.";
-                _logger.LogError(message: log);
+                _logger.LogError("{log}", log);
                 return new NotFoundResponse(log);
             }
 
@@ -95,14 +96,14 @@ namespace Inz.Services
             if(callbackStatusReserved.TryPickT1(out var dbErrorStatusCheckReserved, out var statusReserved))
             {
                 log = $"{LogHelper.DatabaseError}{dbErrorStatusCheckReserved.Exception.Message}";
-                _logger.LogError(message: log);
+                _logger.LogError("{log}", log);
                 return dbErrorStatusCheckReserved;
             }
 
             if(statusReserved == null)
             {
                 log = $"Status does not exist.";
-                _logger.LogError(message: log);
+                _logger.LogError("{log}", log);
                 return new NotFoundResponse(log);
             }
 
@@ -121,7 +122,7 @@ namespace Inz.Services
             if(callbackCreateDoctorVisit.IsT1)
             {
                 log = $"{LogHelper.DatabaseError}{callbackCreateDoctorVisit.AsT1.Exception.Message}";
-                _logger.LogError(message: log);
+                _logger.LogError("{log}", log);
                 return callbackCreateDoctorVisit.AsT1;
             }
 
@@ -130,12 +131,12 @@ namespace Inz.Services
             if(callbackCalendarUpdate.TryPickT1(out var dbErrorCalendarUpdate, out var okResponse))
             {
                 log = $"{LogHelper.DatabaseError}{dbErrorCalendarUpdate.Exception.Message}";
-                _logger.LogError(message: log);
+                _logger.LogError("{log}", log);
                 return dbErrorCalendarUpdate;
             }
 
             log = "New visit has been booked.";
-            _logger.LogInformation(message: log);
+            _logger.LogInformation("{log}", log);
             okResponse.ResponseMessage = log;
             return okResponse;
         }

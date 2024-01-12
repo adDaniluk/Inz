@@ -28,7 +28,7 @@ namespace Inz.Controllers
             _logger = logger;
         }
 
-        [Route("DoctorRegister")]
+        [Route("doctor")]
         [HttpPost]
         public async Task<IActionResult> DoctorRegisterAsync(DoctorDTO doctorDTO)
         {
@@ -44,7 +44,7 @@ namespace Inz.Controllers
             return actionResult;
         }
 
-        [Route("PatientRegister")]
+        [Route("patient")]
         [HttpPost]
         public async Task<IActionResult> PatientRegisterAsync(PatientDTO patientDTO)
         {

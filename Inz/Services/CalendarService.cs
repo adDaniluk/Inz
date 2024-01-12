@@ -1,5 +1,6 @@
 ﻿using Azure;
 using Inz.DTOModel;
+using Inz.Helpers;
 using Inz.Model;
 using Inz.OneOfHelper;
 using Inz.Repository;
@@ -40,14 +41,14 @@ namespace Inz.Services
                     if (callbackDoctor == null)
                     {
                         log = $"Doctor with id {calendarDTO.DoctorId} does not exist.";
-                        _logger.LogInformation(message: log);
+                        _logger.LogInformation("{log}", log);
                         responseHandler = new NotFoundResponse(log);
                     }
                 },
                 dbException =>
                 {
                     log = $"{LogHelper.DatabaseError}{dbException.Exception.Message}";
-                    _logger.LogError(message: log);
+                    _logger.LogError("{log}", log);
                     responseHandler = dbException;
                 });
 
@@ -64,13 +65,13 @@ namespace Inz.Services
                             && calendarDTO.TimeBlockIds.Contains(x.TimeBlockId)))
                 {
                     log = $"Cannot create new calendar block - the calendar already exist";
-                    _logger.LogInformation(message: log);
+                    _logger.LogInformation("{log}", log);
                     return new NotFoundResponse(log);
                 }
 
 
                 var callbackGetStatus = await _statusRepository.GetStatusAsync(StatusEnum.Free);
-                List<Calendar> calendarsList = new List<Calendar>();
+                List<Calendar> calendarsList = new();
 
                 callbackGetStatus.Switch(
                     status =>
@@ -90,14 +91,14 @@ namespace Inz.Services
                         else
                         {
                             log = $"'Open' status does not exist -> missing statuses in database.";
-                            _logger.LogInformation(message: log);
+                            _logger.LogInformation("{log}", log);
                             responseHandler = new NotFoundResponse(log);
                         }
                     },
                     dbException =>
                     {
                         log = $"{LogHelper.DatabaseError}{dbException.Exception.Message}";
-                        _logger.LogError(message: log);
+                        _logger.LogError("{log}", log);
                         responseHandler = dbException;
                     }
                     );
@@ -110,12 +111,12 @@ namespace Inz.Services
                     callbackInsertCalendar.Switch(
                         okResponse => {
                             log = $"New calendar(s) have been created";
-                            _logger.LogInformation(log);
+                            _logger.LogInformation("{log}", log);
                             responseHandler = new OkResponse(log);
                         },
                         dbError => {
                             log = $"{LogHelper.DatabaseError}{dbError.Exception.Message}";
-                            _logger.LogError(message: log);
+                            _logger.LogError("{log}", log);
                             responseHandler = dbError;
                         });
                 }
@@ -140,13 +141,13 @@ namespace Inz.Services
                         }
 
                         log = $"Calendar with Id:{id} does not exist.";
-                        _logger.LogInformation(message: log);
+                        _logger.LogInformation("{log}", log);
                         responseHandler = new NotFoundResponse(log);
                     },
                 databaseException =>
                 {
                     log = $"{LogHelper.DatabaseError}{databaseException.Exception.Message}";
-                    _logger.LogError(message: log);
+                    _logger.LogError("{log}", log);
                     responseHandler = databaseException;
                 });
 
@@ -160,7 +161,7 @@ namespace Inz.Services
             if (startDate.Date > endDate.Date)
             {
                 log = "Start date cannot be before end date.";    
-                _logger.LogInformation(message: log);
+                _logger.LogInformation("{log}", log);
                 return new NotFoundResponse(log);
             }
 
@@ -171,7 +172,7 @@ namespace Inz.Services
                 if (calendars.Count > 0)
                 {
                     log = $"There are ${calendars.Count} calendars between {startDate.Date} and {endDate.Date}";
-                    _logger.LogInformation(message: log);
+                    _logger.LogInformation("{log}", log);
                 }
 
                 return calendars;
@@ -179,7 +180,7 @@ namespace Inz.Services
             else
             {
                 log = $"{LogHelper.DatabaseError}{databaseException.Exception.Message}";
-                _logger.LogError(message: log);
+                _logger.LogError("{log}", log);
                 return databaseException;
             }
         }
