@@ -7,7 +7,7 @@ namespace Inz.Controllers
     {
         public Task<IActionResult> CreateCalendarsAsync(CalendarDTO calendarDTO);
         public Task<IActionResult> GetCalendarByIdAsync(int id);
-        public Task<IActionResult> GetCalendarListByDateRangeAsync(DateTime startDate, DateTime endDate);
+        public Task<IActionResult> GetCalendarListByDateRangeAsync(CalendarTimeframeDTO calendarTimeframeDTO);
         public Task<IActionResult> BookCalendarVisitAsync(DoctorVisitDTO doctorVisitDTO);
     }
 }

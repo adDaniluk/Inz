@@ -35,48 +35,49 @@ namespace Inz.Controllers
 
             var actionResult = callback.Match(
                 calendar => Ok(calendar.ResponseMessage),
-                notFound => NotFound(notFound.ResponseMessage),
+                notFound => Conflict(notFound.ResponseMessage),
                 databaseException => Problem($"{LogHelper.DatabaseErrorController}{databaseException.Exception.Message}"));
 
             return actionResult;
         }
 
-        [Route("calendar")]
+        [Route("calendar/{id}")]
+        [Authorize(Roles = "Doctor,Patient")]
         [HttpGet]
         public async Task<IActionResult> GetCalendarByIdAsync(int id)
         { 
             _logger.LogInformation(message: $"Calling {nameof(GetCalendarByIdAsync)}");
 
-            if(id < 0)
-                return NotFound($"{id} cannot be negative");
-
+            if(id < 1)
+                return NotFound($"Please provide positive integer.");
+            
             var callback = await _calendarService.GetCalendarByIdAsync(id);
 
             var actionResult = callback.Match(
                 calendar => Ok(calendar),
-                notFound => NotFound(notFound.ResponseMessage),
+                notFound => Conflict(notFound.ResponseMessage),
                 databaseException => Problem($"{LogHelper.DatabaseErrorController}{databaseException.Exception.Message}"));
 
             return actionResult;
         }
 
         [Route("calendars")]
+        [Authorize(Roles = "Doctor,Patient")]
         [HttpGet]
-        public async Task<IActionResult> GetCalendarListByDateRangeAsync(DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> GetCalendarListByDateRangeAsync(CalendarTimeframeDTO calendarTimeframeDTO)
         {
             _logger.LogInformation(message: $"Calling {nameof(GetCalendarListByDateRangeAsync)}");
 
-            var callback = await _calendarService.GetCalendarListByDateRangeAsync(startDate, endDate);
+            var callback = await _calendarService.GetCalendarListByDateRangeAsync(calendarTimeframeDTO);
 
             var actionResult = callback.Match(
                 calendar => Ok(calendar),
-                notFound => NotFound(notFound.ResponseMessage),
+                notFound => Conflict(notFound.ResponseMessage),
                 databaseException => Problem($"{LogHelper.DatabaseErrorController}{databaseException.Exception.Message}"));
 
             return actionResult;
         }
 
-        
         [Route("calendar")]
         [HttpPut]
         [Authorize(Roles ="Patient")]
@@ -88,7 +89,7 @@ namespace Inz.Controllers
 
             var actionResult = callback.Match(
                 calendar => Ok(calendar),
-                notFound => NotFound(notFound.ResponseMessage),
+                notFound => Conflict(notFound.ResponseMessage),
                 databaseException => Problem($"{LogHelper.DatabaseErrorController}{databaseException.Exception.Message}"));
 
             return actionResult;

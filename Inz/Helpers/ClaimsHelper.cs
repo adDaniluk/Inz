@@ -1,5 +1,4 @@
-﻿
-namespace Inz.Helpers
+﻿namespace Inz.Helpers
 {
     public static class ClaimsHelper
     {

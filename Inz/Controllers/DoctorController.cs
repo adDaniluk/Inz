@@ -33,7 +33,7 @@ namespace Inz.Controllers
 
             IActionResult actionResult = callback.Match(
                 okResult => Ok(okResult.ResponseMessage),
-                notFound => NotFound(notFound.ResponseMessage),
+                notFound => Conflict(notFound.ResponseMessage),
                 databaseException => Problem($"{LogHelper.DatabaseErrorController}{databaseException.Exception.Message}"));
 
             return actionResult;
@@ -51,7 +51,7 @@ namespace Inz.Controllers
 
             IActionResult actionResult = callback.Match(
                 doctorServices => Ok(doctorServices.ResponseMessage),
-                notFound => NotFound(notFound.ResponseMessage),
+                notFound => Conflict(notFound.ResponseMessage),
                 databaseException => Problem($"{LogHelper.DatabaseErrorController}{databaseException.Exception.Message}"));
 
             return actionResult;
@@ -69,7 +69,7 @@ namespace Inz.Controllers
 
             IActionResult actionResult = callback.Match(
                 doctorServices => Ok(doctorServices.ResponseMessage),
-                notFound => NotFound(notFound.ResponseMessage),
+                notFound => Conflict(notFound.ResponseMessage),
                 databaseException => Problem($"{LogHelper.DatabaseErrorController}{databaseException.Exception.Message}"));
 
             return actionResult;
@@ -87,7 +87,7 @@ namespace Inz.Controllers
 
             IActionResult actionResult = callback.Match(
                 doctor => Ok(doctor),
-                notFound => NotFound(notFound.ResponseMessage),
+                notFound => Conflict(notFound.ResponseMessage),
                 databaseException => Problem($"{LogHelper.DatabaseErrorController}{databaseException.Exception.Message}"));
 
             return actionResult;
