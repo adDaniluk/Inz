@@ -1,11 +1,9 @@
-﻿using Azure;
-using Inz.DTOModel;
+﻿using Inz.DTOModel;
 using Inz.Helpers;
 using Inz.Model;
 using Inz.OneOfHelper;
 using Inz.Repository;
 using OneOf;
-using OneOf.Types;
 
 namespace Inz.Services
 {
@@ -127,7 +125,7 @@ namespace Inz.Services
 
         public async Task<OneOf<Calendar, NotFoundResponse, DatabaseExceptionResponse>> GetCalendarByIdAsync(int id)
         {
-            OneOf<Calendar, NotFoundResponse, DatabaseExceptionResponse> responseHandler = new ();
+            OneOf<Calendar, NotFoundResponse, DatabaseExceptionResponse> responseHandler = new();
             string log;
 
             var callbackGetCalendar = await _calendarRepository.GetCalendarAsync(id);
@@ -140,7 +138,7 @@ namespace Inz.Services
                             responseHandler = okResponse;
                         }
 
-                        log = $"Calendar with Id:{id} does not exist.";
+                        log = $"Calendar with Id: {id} does not exist.";
                         _logger.LogInformation("{log}", log);
                         responseHandler = new NotFoundResponse(log);
                     },
@@ -154,16 +152,21 @@ namespace Inz.Services
             return responseHandler;
         }
 
-        public async Task<OneOf<List<Calendar>, NotFoundResponse, DatabaseExceptionResponse>> GetCalendarListByDateRangeAsync(DateTime startDate, DateTime endDate)
+        public async Task<OneOf<List<Calendar>, NotFoundResponse, DatabaseExceptionResponse>> GetCalendarListByDateRangeAsync(CalendarTimeframeDTO calendarTimeframeDTO)
         {
             string log;
 
-            if (startDate.Date > endDate.Date)
-            {
-                log = "Start date cannot be before end date.";    
-                _logger.LogInformation("{log}", log);
-                return new NotFoundResponse(log);
-            }
+            //if (startDate.Date > endDate.Date)
+            //{
+            //    log = "Start date cannot be before end date.";    
+            //    _logger.LogInformation("{log}", log);
+            //    return new NotFoundResponse(log);
+            //}
+
+            DateTime startDate = DateTime.ParseExact(calendarTimeframeDTO.StartDate, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+            DateTime endDate = DateTime.ParseExact(calendarTimeframeDTO.EndDate, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+
+
 
             var callbackGetCalendarList = await _calendarRepository.GetCalendarListByDateRangeAsync(startDate, endDate);
 

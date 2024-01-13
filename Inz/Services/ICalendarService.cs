@@ -9,6 +9,6 @@ namespace Inz.Services
     {
         public Task<OneOf<OkResponse, NotFoundResponse, DatabaseExceptionResponse>> InsertCalendarAsync(CalendarDTO calendarDTO);
         public Task<OneOf<Calendar, NotFoundResponse, DatabaseExceptionResponse>> GetCalendarByIdAsync(int id);
-        public Task<OneOf<List<Calendar>, NotFoundResponse, DatabaseExceptionResponse>> GetCalendarListByDateRangeAsync(DateTime startDate, DateTime endDate);
+        public Task<OneOf<List<Calendar>, NotFoundResponse, DatabaseExceptionResponse>> GetCalendarListByDateRangeAsync(CalendarTimeframeDTO calendarTimeframeDTO);
     }
 }

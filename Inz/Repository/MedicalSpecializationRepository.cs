@@ -8,7 +8,7 @@ namespace Inz.Repository
 {
     public class MedicalSpecializationRepository : IMedicalSpecializationRepository
     {
-        private DbContextApi _dbContextApi;
+        private readonly DbContextApi _dbContextApi;
         public MedicalSpecializationRepository(DbContextApi dbContextApi)
         {
             _dbContextApi = dbContextApi;
